@@ -3,275 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>人際場力學 — 星系平衡模型</title>
+<meta name="robots" content="noindex, nofollow">
+<title>一顆星的重量 · 人際場力學星系模擬</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&display=swap');
-
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&display=swap');
   :root {
-    --leader-color: #ffb347;
-    --leader-glow: rgba(255, 179, 71, 0.6);
-    --independent-color: #6ec6ff;
-    --independent-glow: rgba(110, 198, 255, 0.4);
-    --stabilizer-color: #c9a0dc;
-    --stabilizer-glow: rgba(201, 160, 220, 0.5);
-    --bg-deep: #060810;
-    --text-dim: rgba(200, 210, 230, 0.5);
-    --text-mid: rgba(200, 210, 230, 0.75);
-    --text-bright: rgba(230, 235, 245, 0.9);
-    --border-subtle: rgba(140, 160, 200, 0.12);
+    --star-c: #ffb347; --planet-c: #6ec6ff; --stab-c: #c9a0dc;
+    --sat-c: #b58ae0; --comet-c: #ff9e6d; --coorb-c: #d9b36a; --ast-c: #ff6d8a; --dark-c: #8a8f9e;
+    --bg-deep: #060810; --panel: rgba(8,12,22,0.86);
+    --dim: rgba(200,210,230,0.55); --mid: rgba(200,210,230,0.8); --bright: rgba(232,236,246,0.94);
+    --line: rgba(140,160,200,0.15); --gold: rgba(200,180,160,0.65);
+    --good: #7fd8a4; --warn: #ffcf7d; --orange: #ffab7d; --bad: #ff8d7d;
   }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; }
+  body { background:var(--bg-deep); font-family:'Noto Sans TC',sans-serif; color:var(--mid); font-size:20px; }
+  #canvas-container { position:fixed; inset:0; z-index:1; }
+  .grain { position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
+  .corner { position:fixed; z-index:3; pointer-events:none; width:60px; height:60px; }
+  .corner.tl { top:16px; left:16px; border-top:2px solid rgba(200,180,160,.22); border-left:2px solid rgba(200,180,160,.22); }
+  .corner.br { bottom:16px; right:16px; border-bottom:2px solid rgba(200,180,160,.22); border-right:2px solid rgba(200,180,160,.22); }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .title-block { position:fixed; top:24px; left:34px; z-index:10; pointer-events:none; }
+  .t-main { font-family:'Cinzel',serif; font-size:16px; font-weight:700; letter-spacing:6px; color:var(--gold); text-transform:uppercase; }
+  .t-sub { font-size:27px; font-weight:700; letter-spacing:3px; color:var(--bright); margin-top:4px; }
+  .t-credit { font-size:16px; letter-spacing:1px; color:var(--dim); margin-top:6px; }
 
-  body {
-    background: var(--bg-deep);
-    overflow: hidden;
-    font-family: 'Noto Sans TC', sans-serif;
-    color: var(--text-mid);
-    cursor: default;
-  }
+  /* 章節導覽 */
+  .chapters { position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:11; display:flex; gap:6px; }
+  .chap-btn { background:rgba(12,16,28,.8); border:1.5px solid var(--line); color:var(--dim);
+    font-size:17px; font-weight:500; letter-spacing:2px; padding:11px 20px; cursor:pointer; transition:.3s; backdrop-filter:blur(8px); font-family:'Noto Sans TC',sans-serif; }
+  .chap-btn:hover { color:var(--bright); }
+  .chap-btn.active { background:rgba(30,40,65,.75); color:var(--bright); border-color:rgba(200,180,160,.5); }
 
-  #canvas-container {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    z-index: 1;
-  }
+  /* 圖鑑 */
+  .dex-toggle { position:fixed; top:24px; right:34px; z-index:11; background:rgba(12,16,28,.8); border:1.5px solid var(--line);
+    color:var(--dim); font-size:17px; font-weight:500; letter-spacing:3px; padding:11px 20px; cursor:pointer; backdrop-filter:blur(8px); transition:.3s; }
+  .dex-toggle:hover, .dex-toggle.on { color:var(--bright); border-color:rgba(200,180,160,.5); }
+  .dex { position:fixed; top:84px; right:34px; z-index:11; width:360px; background:var(--panel); border:1.5px solid var(--line);
+    backdrop-filter:blur(14px); padding:20px 22px; display:none; max-height:calc(100vh - 320px); overflow-y:auto; }
+  .dex.open { display:block; }
+  .dex h4 { font-family:'Cinzel',serif; font-size:14px; letter-spacing:4px; color:var(--gold); text-transform:uppercase; margin-bottom:12px; }
+  .dex-row { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(140,160,200,.14); font-size:17px; align-items:baseline; }
+  .dex-row i { width:15px; height:15px; border-radius:50%; flex:none; position:relative; top:1px; }
+  .dex-row b { color:var(--bright); font-weight:700; white-space:nowrap; }
+  .dex-row span { color:var(--dim); font-size:16px; }
+  .dex-note { font-size:15px; color:var(--dim); margin-top:12px; }
 
-  /* Grain overlay */
-  .grain {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  }
+  /* HUD */
+  .hud { position:fixed; bottom:26px; left:34px; z-index:10; pointer-events:none; }
+  .hud div { font-size:17px; letter-spacing:1.5px; color:var(--dim); line-height:1.9; }
+  .hud .state-line { color:var(--bright); font-weight:700; font-size:19px; }
+  .drag-hint { position:fixed; bottom:26px; right:34px; z-index:10; font-size:16px; letter-spacing:2px; color:var(--dim); pointer-events:none; }
 
-  /* Title block */
-  .title-block {
-    position: fixed;
-    top: 28px; left: 36px;
-    z-index: 10;
-    pointer-events: none;
-  }
+  /* 敘事卡 */
+  .story { position:fixed; bottom:66px; left:50%; transform:translateX(-50%); z-index:12;
+    width:min(920px, calc(100vw - 48px)); background:var(--panel); border:1.5px solid var(--line);
+    backdrop-filter:blur(16px); padding:26px 34px 22px; max-height:64vh; overflow-y:auto; }
+  .story .eyebrow { font-family:'Cinzel',serif; font-size:14px; font-weight:700; letter-spacing:5px; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
+  .story h3 { font-size:26px; color:var(--bright); letter-spacing:2px; font-weight:700; margin-bottom:10px; }
+  .story .body { font-size:20px; line-height:1.75; color:var(--mid); }
+  .story .body .hl { color:var(--bright); font-weight:700; }
+  .story .body .soft { color:var(--dim); font-size:17px; }
+  .story .ask { margin-top:12px; font-size:18px; color:var(--gold); letter-spacing:1px; }
+  .story .ctrls { margin-top:18px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .sbtn { background:rgba(12,16,28,.8); border:1.5px solid rgba(200,180,160,.45); color:rgba(232,224,205,.95);
+    font-size:18px; font-weight:500; letter-spacing:2px; padding:12px 26px; cursor:pointer; transition:.3s; font-family:'Noto Sans TC',sans-serif; }
+  .sbtn:hover { background:rgba(200,180,160,.16); }
+  .sbtn.on { background:rgba(200,180,160,.2); border-color:rgba(200,180,160,.7); }
+  .sbtn.hold { user-select:none; -webkit-user-select:none; touch-action:none; }
+  .sbtn:disabled { opacity:.35; cursor:default; }
+  .sliderbox { display:flex; align-items:center; gap:14px; flex:1; min-width:280px; }
+  .sliderbox label { font-size:18px; color:var(--mid); letter-spacing:2px; white-space:nowrap; font-weight:500; }
+  .sliderbox input[type=range] { flex:1; accent-color:#ffb347; height:26px; cursor:pointer; }
+  .sliderbox .val { font-family:'Cormorant Garamond',serif; font-size:24px; color:var(--bright); width:54px; text-align:right; }
+  .holdring { width:56px; height:56px; flex:none; }
+  .holdring circle.bgc { fill:none; stroke:rgba(140,160,200,.3); stroke-width:5; }
+  .holdring circle.fgc { fill:none; stroke:#ffb347; stroke-width:5; stroke-linecap:round; stroke-dasharray:100.5; stroke-dashoffset:100.5; transform:rotate(-90deg); transform-origin:center; }
+  .gauges { display:flex; gap:22px; flex-wrap:wrap; margin-top:6px; align-items:center; }
+  .gauge { text-align:center; min-width:84px; }
+  .gauge b { display:block; font-family:'Cormorant Garamond',serif; font-size:30px; color:var(--bright); font-weight:500; line-height:1.2; }
+  .gauge span { font-size:16px; color:var(--dim); letter-spacing:1px; }
+  .statechip { display:inline-block; padding:6px 18px; border:2px solid; font-size:18px; font-weight:700; letter-spacing:3px; }
+  .diagbox { margin-top:14px; border-top:1px solid rgba(140,160,200,.18); padding-top:14px; display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+  .diagbox .diag { flex:1; min-width:260px; font-size:19px; color:var(--bright); line-height:1.65; }
 
-  .title-main {
-    font-family: 'Cinzel', serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 6px;
-    color: rgba(200, 180, 160, 0.7);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
+  /* 測驗 */
+  .quiz { width:100%; }
+  .qprog { font-size:16px; color:var(--gold); letter-spacing:2px; margin-bottom:8px; }
+  .qtitle { font-size:22px; font-weight:700; color:var(--bright); line-height:1.6; margin-bottom:14px; }
+  .qopts { display:grid; gap:10px; }
+  .qopt { text-align:left; background:rgba(12,16,28,.8); border:1.5px solid var(--line); color:var(--mid);
+    font-size:18px; line-height:1.6; letter-spacing:1px; padding:13px 20px; cursor:pointer; transition:.25s; font-family:'Noto Sans TC',sans-serif; }
+  .qopt:hover { color:var(--bright); border-color:rgba(200,180,160,.55); background:rgba(200,180,160,.08); }
+  .qback { margin-top:12px; }
+  .report { width:100%; }
+  .report .rline { display:flex; align-items:center; gap:12px; margin:8px 0; }
+  .report .rline span.rname { width:56px; font-size:18px; font-weight:700; color:var(--bright); flex:none; }
+  .report .rtrack { flex:1; height:14px; background:rgba(140,160,200,.16); border-radius:7px; overflow:hidden; }
+  .report .rtrack i { display:block; height:100%; border-radius:7px; transition:width .9s ease; }
+  .report .rline span.rlv { width:56px; font-size:17px; color:var(--gold); text-align:right; flex:none; }
+  .report .rtext { font-size:18px; color:var(--mid); line-height:1.75; margin-top:12px; }
+  .report .rtext b { color:var(--bright); }
+  .report .rnote { font-size:15px; color:var(--dim); margin-top:12px; border-top:1px solid rgba(140,160,200,.15); padding-top:10px; }
 
-  .title-sub {
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: var(--text-bright);
-    margin-bottom: 4px;
-  }
+  /* 重置 */
+  .reset-btn { position:fixed; top:24px; right:150px; z-index:11; background:rgba(12,16,28,.8); border:1.5px solid var(--line);
+    color:var(--dim); font-size:17px; font-weight:500; letter-spacing:3px; padding:11px 20px; cursor:pointer; backdrop-filter:blur(8px); transition:.3s; font-family:'Noto Sans TC',sans-serif; }
+  .reset-btn:hover { color:var(--bad); border-color:var(--bad); }
+  .fine { position:fixed; bottom:8px; left:50%; transform:translateX(-50%); z-index:10; font-size:15px; color:rgba(200,210,230,.5); letter-spacing:1px; pointer-events:none; white-space:nowrap; }
 
-  .title-desc {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 12px;
-    font-style: italic;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-  }
-
-  /* Role cards */
-  .role-cards {
-    position: fixed;
-    right: 28px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    pointer-events: auto;
-  }
-
-  .role-card {
-    background: rgba(8, 12, 22, 0.8);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border-subtle);
-    padding: 16px 20px;
-    min-width: 200px;
-    cursor: pointer;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .role-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px; height: 100%;
-    transition: all 0.4s ease;
-  }
-
-  .role-card[data-role="leader"]::before { background: var(--leader-color); }
-  .role-card[data-role="independent"]::before { background: var(--independent-color); }
-  .role-card[data-role="stabilizer"]::before { background: var(--stabilizer-color); }
-
-  .role-card:hover {
-    background: rgba(15, 20, 35, 0.9);
-    border-color: rgba(140, 160, 200, 0.25);
-    transform: translateX(-4px);
-  }
-
-  .role-card.active {
-    border-color: rgba(140, 160, 200, 0.3);
-  }
-
-  .role-card .role-label {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .role-card[data-role="leader"] .role-label { color: var(--leader-color); }
-  .role-card[data-role="independent"] .role-label { color: var(--independent-color); }
-  .role-card[data-role="stabilizer"] .role-label { color: var(--stabilizer-color); }
-
-  .role-card .role-name {
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-bright);
-    margin-bottom: 8px;
-    letter-spacing: 2px;
-  }
-
-  .role-card .role-desc {
-    font-size: 11px;
-    line-height: 1.7;
-    color: var(--text-dim);
-    letter-spacing: 0.5px;
-  }
-
-  .role-card .role-astro {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 10px;
-    font-style: italic;
-    color: rgba(180, 170, 160, 0.4);
-    margin-top: 8px;
-    letter-spacing: 1px;
-  }
-
-  /* Info panel - bottom left */
-  .info-panel {
-    position: fixed;
-    bottom: 28px; left: 36px;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .info-line {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
-    line-height: 2;
-  }
-
-  /* Controls */
-  .controls {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    display: flex;
-    gap: 6px;
-    pointer-events: auto;
-  }
-
-  .ctrl-btn {
-    background: rgba(12, 16, 28, 0.75);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-dim);
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    padding: 9px 18px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(8px);
-  }
-
-  .ctrl-btn:hover {
-    background: rgba(25, 30, 50, 0.8);
-    border-color: rgba(140, 160, 200, 0.3);
-    color: var(--text-bright);
-  }
-
-  .ctrl-btn.active {
-    background: rgba(30, 40, 65, 0.6);
-    border-color: rgba(140, 160, 200, 0.35);
-    color: var(--text-bright);
-  }
-
-  /* Tooltip */
-  .tooltip {
-    position: fixed;
-    z-index: 20;
-    background: rgba(8, 12, 22, 0.92);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border-subtle);
-    padding: 14px 18px;
-    max-width: 260px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    font-size: 12px;
-    line-height: 1.7;
-    color: var(--text-mid);
-    letter-spacing: 0.5px;
-  }
-
-  .tooltip.visible { opacity: 1; }
-
-  /* Corner accents */
-  .corner-accent {
-    position: fixed;
-    z-index: 3;
-    pointer-events: none;
-  }
-  .corner-accent.tl { top: 16px; left: 16px; width: 50px; height: 50px; border-top: 1px solid rgba(200,180,160,0.1); border-left: 1px solid rgba(200,180,160,0.1); }
-  .corner-accent.br { bottom: 16px; right: 16px; width: 50px; height: 50px; border-bottom: 1px solid rgba(200,180,160,0.1); border-right: 1px solid rgba(200,180,160,0.1); }
-
-  /* Horizontal rule decoration */
-  .title-block .rule {
-    width: 40px;
-    height: 1px;
-    background: rgba(200, 180, 160, 0.2);
-    margin: 10px 0;
-  }
-
-  @media (max-width: 768px) {
-    .role-cards {
-      right: 12px;
-      top: auto;
-      bottom: 70px;
-      transform: none;
-      flex-direction: row;
-      gap: 8px;
-    }
-    .role-card {
-      min-width: auto;
-      padding: 10px 14px;
-    }
-    .role-card .role-desc, .role-card .role-astro { display: none; }
+  @media (max-width:820px) {
+    .chapters { top:auto; bottom:0; left:0; right:0; transform:none; width:100%; z-index:13; }
+    .chap-btn { flex:1; padding:11px 4px; font-size:13px; letter-spacing:1px; }
+    .story { bottom:58px; width:calc(100vw - 16px); padding:16px 16px 14px; max-height:46vh; overflow-y:auto; }
+    .story .body { font-size:16px; }
+    .hud, .drag-hint, .fine { display:none; }
+    .title-block { left:16px; top:16px; }
+    .t-sub { font-size:17px; }
+    .dex-toggle { right:16px; top:16px; }
+    .dex { right:16px; top:64px; width:calc(100vw - 32px); }
   }
 </style>
 </head>
@@ -279,608 +131,669 @@
 
 <div id="canvas-container"></div>
 <div class="grain"></div>
+<div class="corner tl"></div>
+<div class="corner br"></div>
 
-<div class="corner-accent tl"></div>
-<div class="corner-accent br"></div>
-
-<!-- Title -->
 <div class="title-block">
-  <div class="title-main">Interpersonal Field Dynamics</div>
-  <div class="title-sub">星系平衡模型</div>
-  <div class="rule"></div>
-  <div class="title-desc">Galaxy Equilibrium — Stable Field Configuration</div>
+  <div class="t-main">The Weight of a Star</div>
+  <div class="t-sub">一顆星的重量</div>
+  <div class="t-credit">人際場力學星系模擬 · 理論架構 吳星瑩 · AI 應用 江昱德</div>
 </div>
 
-<!-- Role cards -->
-<div class="role-cards">
-  <div class="role-card active" data-role="leader">
-    <div class="role-label">Central Mass</div>
-    <div class="role-name">主導者</div>
-    <div class="role-desc">提供中心引力與方向<br>由獨立者自然浮現</div>
-    <div class="role-astro">— Analogous to the primary star</div>
-  </div>
-  <div class="role-card" data-role="independent">
-    <div class="role-label">Orbiting Bodies</div>
-    <div class="role-name">獨立者</div>
-    <div class="role-desc">各循軌道自行運轉<br>承擔自身重量與責任</div>
-    <div class="role-astro">— Analogous to planetary bodies</div>
-  </div>
-  <div class="role-card" data-role="stabilizer">
-    <div class="role-label">Lagrange Point</div>
-    <div class="role-name">穩場者</div>
-    <div class="role-desc">感知張力，微調平衡<br>必要時出現，穩定後退場</div>
-    <div class="role-astro">— Analogous to Lagrange equilibrium</div>
-  </div>
+<div class="chapters" id="chapNav"></div>
+
+<button class="dex-toggle" id="dexToggle">圖鑑</button>
+<button class="reset-btn" id="resetAll">重置</button>
+<div class="dex" id="dex">
+  <h4>Celestial Index · 力態對照</h4>
+  <div class="dex-row"><i style="background:var(--star-c)"></i><b>恆星｜主導者</b><span>提供中心引力與方向</span></div>
+  <div class="dex-row"><i style="background:var(--planet-c)"></i><b>行星｜獨立者</b><span>自轉自重，各循軌道</span></div>
+  <div class="dex-row"><i style="background:var(--stab-c)"></i><b>拉格朗日點｜穩場者</b><span>在兩股力量之間，站住那個不被拖走的位置</span></div>
+  <div class="dex-row"><i style="background:var(--sat-c)"></i><b>衛星｜依附狀態</b><span>軌道繞著別的星轉。是狀態，不是人格</span></div>
+  <div class="dex-row"><i style="background:var(--coorb-c)"></i><b>共軌天體｜角框型</b><span>跟著局勢在兩條軌道之間換邊</span></div>
+  <div class="dex-row"><i style="background:var(--comet-c)"></i><b>彗星｜游擇型</b><span>拉長的軌道，來了又走</span></div>
+  <div class="dex-row"><i style="background:var(--ast-c)"></i><b>掠日小行星｜挑釁型</b><span>斜切軌道，逼整個場檢查自己穩不穩</span></div>
+  <div class="dex-row"><i style="background:var(--dark-c)"></i><b>暗質量｜操控者</b><span>自己不發光，只看得到別人的軌道被彎</span></div>
+  <div class="dex-note">力態是「人 × 場」的狀態，會滑動、可改變，不是固定人格標籤。</div>
 </div>
 
-<!-- Info -->
-<div class="info-panel">
-  <div class="info-line" id="field-status">場態：穩態運行中</div>
-  <div class="info-line" id="harmony-index">協和指數：0.000</div>
-  <div class="info-line" id="time-display">T + 0.000</div>
+<div class="story" id="story">
+  <div class="eyebrow" id="stEyebrow"></div>
+  <h3 id="stTitle"></h3>
+  <div class="body" id="stBody"></div>
+  <div class="ask" id="stAsk"></div>
+  <div class="ctrls" id="stCtrls"></div>
 </div>
 
-<!-- Controls -->
-<div class="controls">
-  <button class="ctrl-btn active" id="btn-trails">軌跡</button>
-  <button class="ctrl-btn" id="btn-field">力場</button>
-  <button class="ctrl-btn" id="btn-lagrange">拉格朗日點</button>
-  <button class="ctrl-btn" id="btn-perturb">擾動</button>
-  <button class="ctrl-btn" id="btn-reset">重置</button>
+<div class="hud">
+  <div class="state-line" id="hudState">場態：星系平衡</div>
+  <div id="hudHarmony">協和指數：0.000</div>
+  <div id="hudTime">T + 0.00</div>
 </div>
-
-<div class="tooltip" id="tooltip"></div>
+<div class="drag-hint">拖曳旋轉 · 滾輪縮放</div>
+<div class="fine">重力、引力在本頁是隱喻上的分野，不對應物理學上的同一種力 · 本頁為理論教學示意</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// =============================================
-// 人際場力學 — 星系平衡模型 3D Visualization
-// =============================================
+// =====================================================
+// 一顆星的重量 · 人際場力學星系模擬
+// 星空、光暈、軌跡等視覺核心保留自吳星瑩《星系平衡模型》
+// 章節式三力教學與場態判定：江昱德 AI 應用
+// =====================================================
 
-// --- Config ---
-const CONFIG = {
-  leader: {
-    mass: 3.0,
-    color: 0xffb347,
-    radius: 0.18,
-    glowSize: 1.8,
-    label: '主導者'
-  },
-  independents: [
-    { mass: 0.3, color: 0x6ec6ff, orbitRadius: 1.8, orbitSpeed: 0.6, orbitTilt: 0.1, phase: 0 },
-    { mass: 0.25, color: 0x5db8f0, orbitRadius: 2.5, orbitSpeed: 0.4, orbitTilt: -0.15, phase: 2.1 },
-    { mass: 0.28, color: 0x7dd4ff, orbitRadius: 3.2, orbitSpeed: 0.3, orbitTilt: 0.08, phase: 4.2 },
-    { mass: 0.22, color: 0x88dcff, orbitRadius: 2.1, orbitSpeed: 0.5, orbitTilt: -0.05, phase: 1.0 },
-    { mass: 0.26, color: 0x5ebaee, orbitRadius: 3.8, orbitSpeed: 0.22, orbitTilt: 0.2, phase: 3.5 },
-  ],
-  stabilizer: {
-    mass: 0.15,
-    color: 0xc9a0dc,
-    radius: 0.07,
-    label: '穩場者'
-  }
+// ---------- 純邏輯（可獨立測試） ----------
+function fieldState(nInd, nSat, gStar){
+  if (gStar >= 1.6 || nInd === 0) return "lockin";
+  if (nSat >= 2) return "compensate";
+  if (nSat === 1 || nInd < 3 || gStar >= 1.35 || gStar <= 0.7) return "perturb";
+  return "balance";
+}
+const STATE_META = {
+  balance:    { label:"星系平衡", color:"#7fd8a4" },
+  perturb:    { label:"微擾場",   color:"#ffcf7d" },
+  compensate: { label:"代償場",   color:"#ffab7d" },
+  lockin:     { label:"閉鎖場",   color:"#ff8d7d" }
 };
+function harmonyOf(nInd, nSat, gStar, perturbing){
+  let h = 0.92 - 0.12*nSat - 0.07*Math.max(0, 3-nInd) - 0.45*Math.abs(gStar-1) - (perturbing?0.22:0);
+  return Math.max(0.08, Math.min(0.98, h));
+}
+function diagnosis(nInd, nSat, gStar){
+  const s = fieldState(nInd, nSat, gStar);
+  if (s==="balance")    return `這個場目前接近星系平衡：能自轉的星有 ${nInd} 顆，恆星引力適中，重量是分散的。`;
+  if (s==="perturb")    return `這個場出現微擾：能自轉的星剩 ${nInd} 顆${nSat?`、衛星 ${nSat} 顆`:""}，重心開始偏移，穩場者介入變頻繁。`;
+  if (s==="compensate") return `這個場偏向代償：${nSat} 顆衛星掛在少數星體上，還能自轉的星正在替別人承重。`;
+  return `這個場逼近閉鎖：引力過強，外圈自轉的星消失，回路裡只剩同一種聲音。`;
+}
 
-let showTrails = true;
-let showField = false;
-let showLagrange = false;
-let perturbMode = false;
-let perturbTimer = 0;
-let simTime = 0;
-
-// --- Three.js ---
+// ---------- Three.js 基礎（保留原作） ----------
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
-camera.position.set(0, 5, 9);
-camera.lookAt(0, 0, 0);
-
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, .1, 500);
+camera.position.set(0,5,9); camera.lookAt(0,0,0);
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
 
-// --- Starfield ---
 const starGeo = new THREE.BufferGeometry();
-const starCount = 2500;
-const starPos = new Float32Array(starCount * 3);
-const starSizes = new Float32Array(starCount);
-for (let i = 0; i < starCount; i++) {
-  starPos[i*3] = (Math.random()-0.5) * 200;
-  starPos[i*3+1] = (Math.random()-0.5) * 200;
-  starPos[i*3+2] = (Math.random()-0.5) * 200;
-  starSizes[i] = Math.random() * 1.2 + 0.2;
-}
-starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
-
+const N=2500, sp=new Float32Array(N*3), ss=new Float32Array(N);
+for(let i=0;i<N;i++){ sp[i*3]=(Math.random()-.5)*200; sp[i*3+1]=(Math.random()-.5)*200; sp[i*3+2]=(Math.random()-.5)*200; ss[i]=Math.random()*1.9+.7; }
+starGeo.setAttribute('position', new THREE.BufferAttribute(sp,3));
+starGeo.setAttribute('size', new THREE.BufferAttribute(ss,1));
 const starMat = new THREE.ShaderMaterial({
-  uniforms: { time: { value: 0 } },
-  vertexShader: `
-    attribute float size;
-    uniform float time;
-    varying float vAlpha;
-    void main() {
-      vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-      gl_PointSize = size * (60.0 / -mvPos.z);
-      gl_Position = projectionMatrix * mvPos;
-      vAlpha = 0.3 + 0.5 * sin(time * 0.3 + position.x * 0.05 + position.y * 0.08);
-    }
-  `,
-  fragmentShader: `
-    varying float vAlpha;
-    void main() {
-      float d = length(gl_PointCoord - 0.5);
-      if (d > 0.5) discard;
-      float alpha = smoothstep(0.5, 0.0, d) * vAlpha;
-      gl_FragColor = vec4(0.8, 0.82, 0.9, alpha);
-    }
-  `,
-  transparent: true, depthWrite: false
-});
+  uniforms:{time:{value:0}},
+  vertexShader:`attribute float size; uniform float time; varying float vA;
+    void main(){ vec4 mv=modelViewMatrix*vec4(position,1.0); gl_PointSize=size*(60.0/-mv.z);
+    gl_Position=projectionMatrix*mv; vA=.3+.5*sin(time*.3+position.x*.05+position.y*.08);}`,
+  fragmentShader:`varying float vA; void main(){ float d=length(gl_PointCoord-.5); if(d>.5) discard;
+    gl_FragColor=vec4(.8,.82,.9,smoothstep(.5,.0,d)*vA);}`,
+  transparent:true, depthWrite:false });
 scene.add(new THREE.Points(starGeo, starMat));
 
-// --- Glow texture ---
-function makeGlow(color, intensity) {
-  const s = 256;
-  const c = document.createElement('canvas');
-  c.width = s; c.height = s;
-  const ctx = c.getContext('2d');
-  const r = Math.floor(((color >> 16) & 0xff));
-  const g = Math.floor(((color >> 8) & 0xff));
-  const b = Math.floor((color & 0xff));
-  const grad = ctx.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
-  grad.addColorStop(0, `rgba(${r},${g},${b},${intensity})`);
-  grad.addColorStop(0.2, `rgba(${r},${g},${b},${intensity*0.5})`);
-  grad.addColorStop(0.5, `rgba(${r},${g},${b},${intensity*0.15})`);
-  grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0,0,s,s);
+function makeGlow(hex, inten){
+  const s=256,c=document.createElement('canvas'); c.width=s;c.height=s;
+  const x=c.getContext('2d'), r=(hex>>16)&255,g=(hex>>8)&255,b=hex&255;
+  const gr=x.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  gr.addColorStop(0,`rgba(${r},${g},${b},${inten})`); gr.addColorStop(.2,`rgba(${r},${g},${b},${inten*.5})`);
+  gr.addColorStop(.5,`rgba(${r},${g},${b},${inten*.15})`); gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
+  x.fillStyle=gr; x.fillRect(0,0,s,s);
   return new THREE.CanvasTexture(c);
 }
+function sprite(hex,inten,scale){
+  const spx=new THREE.Sprite(new THREE.SpriteMaterial({map:makeGlow(hex,inten),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+  spx.scale.set(scale,scale,1); scene.add(spx); return spx;
+}
 
-// --- Leader (主導者) ---
-const leaderGeo = new THREE.SphereGeometry(CONFIG.leader.radius, 48, 48);
-const leaderMat = new THREE.MeshBasicMaterial({ color: CONFIG.leader.color });
-const leaderMesh = new THREE.Mesh(leaderGeo, leaderMat);
-scene.add(leaderMesh);
+// 恆星（主導者）
+const starMesh = new THREE.Mesh(new THREE.SphereGeometry(.24,48,48), new THREE.MeshBasicMaterial({color:0xffb347}));
+scene.add(starMesh);
+const starGlow = sprite(0xffb347,.7,2.3), starGlow2 = sprite(0xffeedd,.4,.95);
 
-const leaderGlowMat = new THREE.SpriteMaterial({
-  map: makeGlow(CONFIG.leader.color, 0.7),
-  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-});
-const leaderGlow = new THREE.Sprite(leaderGlowMat);
-leaderGlow.scale.set(CONFIG.leader.glowSize, CONFIG.leader.glowSize, 1);
-scene.add(leaderGlow);
+// ---------- 星體系統 ----------
+let simT=0, gStar=1, gStarShow=1, perturbing=false, perturbT=0, awareness=false;
 
-// Secondary inner glow
-const leaderGlow2Mat = new THREE.SpriteMaterial({
-  map: makeGlow(0xffeedd, 0.4),
-  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-});
-const leaderGlow2 = new THREE.Sprite(leaderGlow2Mat);
-leaderGlow2.scale.set(0.7, 0.7, 1);
-scene.add(leaderGlow2);
-
-// --- Independents (獨立者) ---
-const indMeshes = [];
-const indGlows = [];
-const indTrails = [];
-const indTrailData = [];
-
-CONFIG.independents.forEach((cfg, i) => {
-  // Body
-  const geo = new THREE.SphereGeometry(0.06, 24, 24);
-  const mat = new THREE.MeshBasicMaterial({ color: cfg.color });
-  const mesh = new THREE.Mesh(geo, mat);
+function makeBody(o){
+  const mesh=new THREE.Mesh(new THREE.SphereGeometry(o.size,24,24), new THREE.MeshBasicMaterial({color:o.color,transparent:true}));
   scene.add(mesh);
-  indMeshes.push(mesh);
+  const glow=sprite(o.color,.55,o.size*7.5);
+  const tg=new THREE.BufferGeometry();
+  tg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(1500*3),3)); tg.setDrawRange(0,0);
+  const trail=new THREE.Line(tg,new THREE.LineBasicMaterial({color:o.color,transparent:true,opacity:.45})); scene.add(trail);
+  const bg=new THREE.BufferGeometry();
+  bg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
+  const bond=new THREE.Line(bg,new THREE.LineBasicMaterial({color:o.color,transparent:true,opacity:0})); scene.add(bond);
+  return Object.assign({mesh,glow,trail,bond,trailPts:[],pos:new THREE.Vector3(),
+    baseR:o.r, curR:o.r, phase:o.phase||Math.random()*6.28, speed:o.speed||.4, tilt:o.tilt||0,
+    mode:o.mode||"orbit", host:null, satLerp:0, alive:true, wobble:0, selfWeight:o.selfWeight!=null?o.selfWeight:.8,
+    escapeA: o.escapeA||0 }, o);
+}
+function orbitPos(b,t){
+  const gPull=Math.pow(gStarShow,.85);
+  const r=(b.curR/gPull)+b.wobble*Math.sin(t*2.2+b.phase*3);
+  const a=b.phase+t*b.speed*gPull;
+  return new THREE.Vector3(Math.cos(a)*r, Math.sin(a*.5)*b.tilt*b.curR, Math.sin(a)*r);
+}
 
-  // Glow
-  const glowMat = new THREE.SpriteMaterial({
-    map: makeGlow(cfg.color, 0.5),
-    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-  });
-  const glow = new THREE.Sprite(glowMat);
-  glow.scale.set(0.35, 0.35, 1);
-  scene.add(glow);
-  indGlows.push(glow);
+// 行星（獨立者）
+const P1=makeBody({color:0x6ec6ff,r:2.0,speed:.55,tilt:.08,phase:.5,size:.095});
+const P2=makeBody({color:0x7dd4ff,r:2.8,speed:.38,tilt:-.12,phase:2.4,size:.088});
+const P3=makeBody({color:0x5ebaee,r:3.6,speed:.27,tilt:.15,phase:4.6,size:.09});
+let planets=[P1,P2,P3], extraPlanets=[], satellites=[];
 
-  // Orbit ring (subtle)
-  const orbitGeo = new THREE.RingGeometry(cfg.orbitRadius - 0.005, cfg.orbitRadius + 0.005, 128);
-  const orbitMat = new THREE.MeshBasicMaterial({
-    color: cfg.color, transparent: true, opacity: 0.06, side: THREE.DoubleSide
-  });
-  const orbitMesh = new THREE.Mesh(orbitGeo, orbitMat);
-  orbitMesh.rotation.x = -Math.PI / 2 + cfg.orbitTilt;
-  scene.add(orbitMesh);
+// 共軌天體（角框型）：在兩條軌道之間換邊
+const CO=makeBody({color:0xd9b36a,r:2.0,speed:.6,tilt:.03,phase:3.4,size:.068,mode:"coorb"});
+// 彗星（游擇型）：拉長軌道
+const CM=makeBody({color:0xff9e6d,r:4.2,speed:.3,tilt:.1,phase:1.2,size:.068,mode:"comet"});
+CM.ecc=.65; CM.eccShow=.65; CM.aShow=4.2; CM.a=4.2;
+// 掠日小行星（挑釁型）：斜切軌道
+const AS=makeBody({color:0xff6d8a,r:3.0,speed:.42,tilt:.55,phase:5.5,size:.06});
+// 暗質量（操控者）：終章開關
+const DK=makeBody({color:0x8a8f9e,r:3.2,speed:.18,tilt:0,phase:2.8,size:.07,mode:"dark"});
+DK.mesh.visible=false; DK.glow.visible=false;
+const dkRing=new THREE.Mesh(new THREE.RingGeometry(.26,.31,48), new THREE.MeshBasicMaterial({color:0x8a8f9e,transparent:true,opacity:0,side:THREE.DoubleSide}));
+scene.add(dkRing);
+let darkOn=false;
 
-  // Trail
-  const trailGeo = new THREE.BufferGeometry();
-  const trailPositions = new Float32Array(1500 * 3);
-  trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
-  trailGeo.setDrawRange(0, 0);
-  const trailMat = new THREE.LineBasicMaterial({
-    color: cfg.color, transparent: true, opacity: 0.25
-  });
-  const trailLine = new THREE.Line(trailGeo, trailMat);
-  scene.add(trailLine);
-  indTrails.push(trailLine);
-  indTrailData.push([]);
-});
-
-// --- Stabilizer (穩場者) ---
-const stabGeo = new THREE.SphereGeometry(CONFIG.stabilizer.radius, 24, 24);
-const stabMat = new THREE.MeshBasicMaterial({ color: CONFIG.stabilizer.color });
-const stabMesh = new THREE.Mesh(stabGeo, stabMat);
-scene.add(stabMesh);
-
-const stabGlowMat = new THREE.SpriteMaterial({
-  map: makeGlow(CONFIG.stabilizer.color, 0.6),
-  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
-});
-const stabGlow = new THREE.Sprite(stabGlowMat);
-stabGlow.scale.set(0.5, 0.5, 1);
-scene.add(stabGlow);
-
-// Stabilizer pulsing ring
-const stabRingGeo = new THREE.RingGeometry(0.12, 0.14, 48);
-const stabRingMat = new THREE.MeshBasicMaterial({
-  color: CONFIG.stabilizer.color, transparent: true, opacity: 0.2, side: THREE.DoubleSide
-});
-const stabRing = new THREE.Mesh(stabRingGeo, stabRingMat);
+// 穩場者（拉格朗日點）
+const stab=makeBody({color:0xc9a0dc,r:2.0,speed:.55,phase:.5+Math.PI/3,size:.075,mode:"stab"});
+const stabRingMat=new THREE.MeshBasicMaterial({color:0xc9a0dc,transparent:true,opacity:.2,side:THREE.DoubleSide});
+const stabRing=new THREE.Mesh(new THREE.RingGeometry(.16,.21,48), stabRingMat);
 scene.add(stabRing);
 
-// --- Lagrange points visualization ---
-const lagrangeMarkers = [];
-const lagrangeLabels = ['L1', 'L2', 'L3', 'L4', 'L5'];
-for (let i = 0; i < 5; i++) {
-  const markerGeo = new THREE.SphereGeometry(0.03, 16, 16);
-  const markerMat = new THREE.MeshBasicMaterial({
-    color: 0xc9a0dc, transparent: true, opacity: 0.5
-  });
-  const marker = new THREE.Mesh(markerGeo, markerMat);
-  marker.visible = false;
-  scene.add(marker);
+let youBody=null;
+function allBodies(){ const l=[P1,P2,P3,...extraPlanets,...satellites,CO,CM,AS,DK,stab]; if(youBody) l.push(youBody); return l; }
 
-  // Dashed ring around marker
-  const ringGeo = new THREE.RingGeometry(0.06, 0.065, 32);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: 0xc9a0dc, transparent: true, opacity: 0.25, side: THREE.DoubleSide
-  });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.visible = false;
-  scene.add(ring);
+// ---------- 相機 ----------
+let camA=0,camR=9,camH=5, tA=0,tR=9,tH=5, drag=false, pm={x:0,y:0};
+const dom=renderer.domElement;
+dom.addEventListener('mousedown',e=>{drag=true;pm={x:e.clientX,y:e.clientY};});
+dom.addEventListener('mousemove',e=>{ if(!drag)return;
+  tA+=(e.clientX-pm.x)*.004; tH+=(e.clientY-pm.y)*.015; tH=Math.max(-3,Math.min(12,tH)); pm={x:e.clientX,y:e.clientY};});
+dom.addEventListener('mouseup',()=>drag=false);
+dom.addEventListener('mouseleave',()=>drag=false);
+dom.addEventListener('wheel',e=>{ tR+=e.deltaY*.005; tR=Math.max(3,Math.min(18,tR)); },{passive:true});
+dom.addEventListener('touchstart',e=>{ if(e.touches.length===1){drag=true;pm={x:e.touches[0].clientX,y:e.touches[0].clientY};}},{passive:true});
+dom.addEventListener('touchmove',e=>{ if(drag&&e.touches.length===1){
+  tA+=(e.touches[0].clientX-pm.x)*.004; tH+=(e.touches[0].clientY-pm.y)*.015; tH=Math.max(-3,Math.min(12,tH));
+  pm={x:e.touches[0].clientX,y:e.touches[0].clientY};}},{passive:true});
+dom.addEventListener('touchend',()=>drag=false);
 
-  lagrangeMarkers.push({ sphere: marker, ring: ring });
-}
+// ---------- 章節 ----------
+let chap=0;
+const CH=[
+{ eb:"Prologue · 場", title:"你的團隊裡，誰最先扛不住？",
+  body:`每個團體都是一個場，每個人都是一顆有重量的星。<span class="hl">恆星</span>給方向、<span class="hl">行星</span>自轉、<span class="hl">拉格朗日點</span>上有人默默配平。這個星系接下來會用三個實驗，講完人際場力學的三個力：<span class="hl">重力、引力、慣性</span>。<div class="soft" style="margin-top:6px">右上角「圖鑑」可查八種星體對照。重力與引力在本頁是隱喻的分野，不對應物理學上的同一種力。</div>`,
+  ask:"", ctrls:"pro" },
+{ eb:"Chapter I · 重力", title:"重力：你扛住自己的能力",
+  body:`選中的這顆行星（亮框），把它的<span class="hl">自重</span>調低看看。重力變低，不會讓一顆星消失，只會讓它的軌道<span class="hl">開始繞著別人轉</span>：先是晃，然後被最近的大星體收編成衛星。再把自重調回來，它會掙脫，回到自己的軌道。<div class="soft" style="margin-top:6px">衛星是狀態，不是人格。滑桿隨時可以調回來。</div>`,
+  ask:"想一想：你的團隊裡，誰的軌道正在繞著別人轉？", ctrls:"g1" },
+{ eb:"Chapter II · 引力", title:"引力：場把人留下來的力量",
+  body:`調大<span class="hl">恆星引力</span>：游離的彗星會被捕獲進軌道，這是結構的價值，場留得住人。但繼續調大，所有星體被拉進緊貼的內圈，外圈自轉的行星消失，場進入<span class="hl">閉鎖</span>。<div class="soft" style="margin-top:6px">白話說：這就是為什麼有些團體會變成小圈圈，新人進不來，舊人出不去，最後只剩同一種聲音。</div>`,
+  ask:"想一想：你的場，是留得住人，還是吞掉了人？", ctrls:"g2" },
+{ eb:"Chapter III · 慣性", title:"慣性：場記得原本的樣子",
+  body:`這一章在測：<span class="hl">改變一個模式，需要多少持續的力氣</span>。按住下面的按鈕，對亮框行星持續施力，把它推去新軌道。太早放手，它會滑回原位；施力夠久，新軌道才會成為它的家。<div class="soft" style="margin-top:6px">開啟「覺察力」再試一次：覺察力不是一種場力，是能讓你鬆開慣性的手。</div>`,
+  ask:"想一想：你想改變的那件事，施力多久了？", ctrls:"g3" },
+{ eb:"Finale · 場的健康", title:"把三個力放在一起看",
+  body:`現在你可以自由組場：加減星體、施加擾動、顯示暗質量，看協和指數與場態怎麼變。<span class="hl">誰先晃，是重力；誰被留下，是引力；多久回穩，是慣性。</span>`,
+  ask:"", ctrls:"g4" },
+{ eb:"Assessment · 我的星", title:"十二題，把你的星放進星系",
+  body:`十二個日常情境，每題選一個最像此刻的你的答案，約三分鐘。做完會算出你的<span class="hl">重力、引力、慣性</span>與傾向力態，你的星會被放進上面的星系，並產出一份可複製的報告。<div class="soft" style="margin-top:6px">測的是「此刻的你 × 你想的那個場」。請先在心裡選定一個場（公司、社團、家庭），全程用同一個場作答。</div>`,
+  ask:"", ctrls:"quiz" }
+];
 
-// --- Force field lines ---
-const fieldLines = [];
-const fieldLineCount = 24;
-for (let i = 0; i < fieldLineCount; i++) {
-  const geo = new THREE.BufferGeometry();
-  const positions = new Float32Array(60 * 3);
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setDrawRange(0, 0);
-  const mat = new THREE.LineBasicMaterial({
-    color: 0xffb347, transparent: true, opacity: 0.06
-  });
-  const line = new THREE.Line(geo, mat);
-  line.visible = false;
-  scene.add(line);
-  fieldLines.push(line);
-}
-
-// --- Connection lines (gravitational bonds) ---
-const bondLines = [];
-for (let i = 0; i < CONFIG.independents.length; i++) {
-  const geo = new THREE.BufferGeometry();
-  const positions = new Float32Array(6);
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const mat = new THREE.LineBasicMaterial({
-    color: CONFIG.independents[i].color, transparent: true, opacity: 0.05
-  });
-  const line = new THREE.Line(geo, mat);
-  scene.add(line);
-  bondLines.push(line);
-}
-
-// --- Camera control ---
-let camAngle = 0;
-let camRadius = 9;
-let camHeight = 5;
-let targetAngle = 0;
-let targetRadius = 9;
-let targetHeight = 5;
-let isDrag = false;
-let prevM = { x: 0, y: 0 };
-
-renderer.domElement.addEventListener('mousedown', e => { isDrag = true; prevM = { x: e.clientX, y: e.clientY }; });
-renderer.domElement.addEventListener('mousemove', e => {
-  if (!isDrag) return;
-  targetAngle += (e.clientX - prevM.x) * 0.004;
-  targetHeight += (e.clientY - prevM.y) * 0.015;
-  targetHeight = Math.max(-3, Math.min(12, targetHeight));
-  prevM = { x: e.clientX, y: e.clientY };
-});
-renderer.domElement.addEventListener('mouseup', () => isDrag = false);
-renderer.domElement.addEventListener('mouseleave', () => isDrag = false);
-renderer.domElement.addEventListener('wheel', e => {
-  targetRadius += e.deltaY * 0.005;
-  targetRadius = Math.max(3, Math.min(18, targetRadius));
+const nav=document.getElementById('chapNav');
+["序章","一 重力","二 引力","三 慣性","終章","測驗"].forEach((t,i)=>{
+  const b=document.createElement('button'); b.className='chap-btn'; b.textContent=t;
+  b.addEventListener('click',()=>gotoChap(i)); nav.appendChild(b);
 });
 
-// Touch
-renderer.domElement.addEventListener('touchstart', e => {
-  if (e.touches.length === 1) { isDrag = true; prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
-});
-renderer.domElement.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if (isDrag && e.touches.length === 1) {
-    targetAngle += (e.touches[0].clientX - prevM.x) * 0.004;
-    targetHeight += (e.touches[0].clientY - prevM.y) * 0.015;
-    targetHeight = Math.max(-3, Math.min(12, targetHeight));
-    prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+// 章節控制項模板
+function ctrlHTML(kind){
+  if(kind==="pro") return `<button class="sbtn" id="btnQuick">直接玩（30 秒）</button><button class="sbtn" id="btnFull">從第一章開始</button><button class="sbtn" id="btnQuiz">做測驗，放進你的星</button>`;
+  if(kind==="quiz") return `<div class="quiz" id="quizBox"></div>`;
+  if(kind==="g1") return `<div class="sliderbox"><label>自重</label><input type="range" id="swSlider" min="0" max="100" value="80"><span class="val" id="swVal">0.80</span></div>`;
+  if(kind==="g2") return `<div class="sliderbox"><label>恆星引力</label><input type="range" id="gSlider" min="50" max="200" value="100"><span class="val" id="gVal">1.00</span></div><span class="soft" id="g2Note" style="font-size:14px;color:var(--dim)"></span>`;
+  if(kind==="g3") return `<button class="sbtn hold" id="holdBtn">按住：對它持續施力</button>
+    <svg class="holdring" viewBox="0 0 40 40"><circle class="bgc" cx="20" cy="20" r="16"/><circle class="fgc" id="holdArc" cx="20" cy="20" r="16"/></svg>
+    <button class="sbtn" id="awBtn">覺察力：關</button><span class="soft" id="g3Note" style="font-size:14px;color:var(--dim)"></span>`;
+  if(kind==="g4") return `
+    <div class="ctrls" style="margin-top:0">
+      <button class="sbtn" id="addInd">＋獨立者</button><button class="sbtn" id="rmInd">－獨立者</button>
+      <button class="sbtn" id="addSat">＋依附</button><button class="sbtn" id="rmSat">－依附</button>
+      <button class="sbtn" id="btnPerturb">擾動</button>
+      <button class="sbtn" id="btnDark">暗質量：關</button>
+    </div>
+    <div class="gauges">
+      <div class="gauge"><b id="gInd">3</b><span>自轉的星</span></div>
+      <div class="gauge"><b id="gSat">0</b><span>衛星</span></div>
+      <div class="gauge"><b id="gG">1.00</b><span>恆星引力</span></div>
+      <div class="gauge"><b id="gH">0.90</b><span>協和指數</span></div>
+      <div class="gauge"><span class="statechip" id="gState">星系平衡</span></div>
+    </div>
+    <div class="diagbox"><div class="diag" id="diagText"></div><button class="sbtn" id="copyDiag">複製這句話</button></div>`;
+  return "";
+}
+
+function gotoChap(i){
+  chap=i;
+  document.querySelectorAll('.chap-btn').forEach((b,k)=>b.classList.toggle('active',k===i));
+  const c=CH[i];
+  document.getElementById('stEyebrow').textContent=c.eb;
+  document.getElementById('stTitle').textContent=c.title;
+  document.getElementById('stBody').innerHTML=c.body;
+  document.getElementById('stAsk').textContent=c.ask;
+  document.getElementById('stCtrls').innerHTML=ctrlHTML(c.ctrls);
+  bindCtrls(c.ctrls);
+  // 章節重點標示
+  P2.highlight = (i===1); P1.highlight = (i===3);
+  if(i!==2){ /* 離開引力章不強制還原，終章可續玩 */ }
+}
+function bindCtrls(kind){
+  if(kind==="pro"){
+    document.getElementById('btnQuick').onclick=()=>gotoChap(1);
+    document.getElementById('btnFull').onclick=()=>gotoChap(1);
+    document.getElementById('btnQuiz').onclick=()=>gotoChap(5);
   }
-}, { passive: false });
-renderer.domElement.addEventListener('touchend', () => isDrag = false);
-
-// --- UI ---
-const btnTrails = document.getElementById('btn-trails');
-const btnField = document.getElementById('btn-field');
-const btnLagrange = document.getElementById('btn-lagrange');
-const btnPerturb = document.getElementById('btn-perturb');
-const btnReset = document.getElementById('btn-reset');
-
-btnTrails.addEventListener('click', () => { showTrails = !showTrails; btnTrails.classList.toggle('active', showTrails); });
-btnField.addEventListener('click', () => { showField = !showField; btnField.classList.toggle('active', showField); });
-btnLagrange.addEventListener('click', () => { showLagrange = !showLagrange; btnLagrange.classList.toggle('active', showLagrange); });
-btnPerturb.addEventListener('click', () => {
-  perturbMode = true;
-  perturbTimer = 0;
-  btnPerturb.classList.add('active');
-});
-btnReset.addEventListener('click', () => {
-  perturbMode = false;
-  perturbTimer = 0;
-  btnPerturb.classList.remove('active');
-  for (let td of indTrailData) td.length = 0;
-  simTime = 0;
-});
-
-// Role card hover
-document.querySelectorAll('.role-card').forEach(card => {
-  card.addEventListener('mouseenter', () => {
-    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-    highlightRole(card.dataset.role);
-  });
-});
-
-let highlightedRole = null;
-function highlightRole(role) {
-  highlightedRole = role;
-  setTimeout(() => { if (highlightedRole === role) highlightedRole = null; }, 3000);
-}
-
-// --- Compute positions ---
-function getIndPosition(cfg, time) {
-  const speed = perturbMode
-    ? cfg.orbitSpeed * (1 + 0.3 * Math.sin(time * 1.5 + cfg.phase))
-    : cfg.orbitSpeed;
-  const angle = cfg.phase + time * speed;
-  const wobble = perturbMode ? 0.15 * Math.sin(time * 2 + cfg.phase * 3) : 0;
-  const r = cfg.orbitRadius + wobble;
-  const x = Math.cos(angle) * r;
-  const z = Math.sin(angle) * r;
-  const y = Math.sin(angle * 0.5) * cfg.orbitTilt * cfg.orbitRadius;
-  return new THREE.Vector3(x, y, z);
-}
-
-function getStabilizerPosition(time) {
-  // Stabilizer orbits at a Lagrange-like point, roughly 60 degrees ahead of the largest independent
-  const baseAngle = CONFIG.independents[0].phase + time * CONFIG.independents[0].orbitSpeed + Math.PI / 3;
-  const r = CONFIG.independents[0].orbitRadius;
-  const breathe = perturbMode ? 0.3 * Math.sin(time * 0.8) : 0.05 * Math.sin(time * 0.3);
-  const x = Math.cos(baseAngle) * (r + breathe);
-  const z = Math.sin(baseAngle) * (r + breathe);
-  const y = 0.1 * Math.sin(time * 0.4);
-  return new THREE.Vector3(x, y, z);
-}
-
-function computeLagrangePoints(time) {
-  // Simplified L-point positions relative to leader and largest independent
-  const ind0Pos = getIndPosition(CONFIG.independents[0], time);
-  const dir = ind0Pos.clone().normalize();
-  const r = ind0Pos.length();
-
-  const points = [];
-  // L1: between leader and ind0
-  points.push(dir.clone().multiplyScalar(r * 0.65));
-  // L2: beyond ind0
-  points.push(dir.clone().multiplyScalar(r * 1.2));
-  // L3: opposite side
-  points.push(dir.clone().multiplyScalar(-r * 0.95));
-  // L4: 60 degrees ahead
-  const a4 = Math.atan2(dir.z, dir.x) + Math.PI / 3;
-  points.push(new THREE.Vector3(Math.cos(a4) * r, 0, Math.sin(a4) * r));
-  // L5: 60 degrees behind
-  const a5 = Math.atan2(dir.z, dir.x) - Math.PI / 3;
-  points.push(new THREE.Vector3(Math.cos(a5) * r, 0, Math.sin(a5) * r));
-
-  return points;
-}
-
-function computeFieldLines(time) {
-  for (let i = 0; i < fieldLineCount; i++) {
-    const angle = (i / fieldLineCount) * Math.PI * 2;
-    const pts = fieldLines[i].geometry.attributes.position.array;
-    const steps = 20;
-    for (let j = 0; j < steps; j++) {
-      const r = 0.3 + j * 0.25;
-      const spiralAngle = angle + j * 0.08 + time * 0.1;
-      pts[j*3] = Math.cos(spiralAngle) * r;
-      pts[j*3+1] = Math.sin(time * 0.2 + j * 0.1) * 0.1;
-      pts[j*3+2] = Math.sin(spiralAngle) * r;
-    }
-    fieldLines[i].geometry.attributes.position.needsUpdate = true;
-    fieldLines[i].geometry.setDrawRange(0, steps);
-    fieldLines[i].visible = showField;
+  if(kind==="quiz"){ renderQuiz(); }
+  if(kind==="g1"){
+    const s=document.getElementById('swSlider'), v=document.getElementById('swVal');
+    s.value=Math.round(P2.selfWeight*100); v.textContent=P2.selfWeight.toFixed(2);
+    s.oninput=()=>{ P2.selfWeight=s.value/100; v.textContent=P2.selfWeight.toFixed(2); };
+  }
+  if(kind==="g2"){
+    const s=document.getElementById('gSlider'), v=document.getElementById('gVal');
+    s.value=Math.round(gStar*100); v.textContent=gStar.toFixed(2);
+    s.oninput=()=>{ gStar=s.value/100; v.textContent=gStar.toFixed(2); updateG2Note(); };
+    updateG2Note();
+  }
+  if(kind==="g3"){
+    const hb=document.getElementById('holdBtn'), ab=document.getElementById('awBtn');
+    const down=e=>{ e.preventDefault(); holding=true; };
+    const up=()=>{ holding=false; };
+    hb.addEventListener('mousedown',down); hb.addEventListener('touchstart',down,{passive:false});
+    addEventListener('mouseup',up); hb.addEventListener('touchend',up);
+    ab.onclick=()=>{ awareness=!awareness; ab.textContent=`覺察力：${awareness?'開':'關'}`; ab.classList.toggle('on',awareness);
+      document.getElementById('g3Note').textContent = awareness ? "覺察力開啟：同樣的改變，需要的持續施力少了一半以上" : ""; };
+  }
+  if(kind==="g4"){
+    document.getElementById('addInd').onclick=()=>{ if(extraPlanets.length<2){
+      extraPlanets.push(makeBody({color:0x88dcff,r:2.4+extraPlanets.length*.9,speed:.45,tilt:(Math.random()-.5)*.3,size:.085})); refreshGauges(); }};
+    document.getElementById('rmInd').onclick=()=>{ const b=extraPlanets.pop(); if(b) killBody(b); refreshGauges(); };
+    document.getElementById('addSat').onclick=()=>{ if(satellites.length<3){
+      const host=[P1,P2,P3][satellites.length%3];
+      const sat=makeBody({color:0xb58ae0,r:.42,speed:2.4,size:.055,mode:"sat"}); sat.host=host;
+      satellites.push(sat); refreshGauges(); }};
+    document.getElementById('rmSat').onclick=()=>{ const b=satellites.pop(); if(b) killBody(b); refreshGauges(); };
+    document.getElementById('btnPerturb').onclick=()=>{ perturbing=true; perturbT=0; };
+    document.getElementById('btnDark').onclick=()=>{ darkOn=!darkOn;
+      document.getElementById('btnDark').textContent=`暗質量：${darkOn?'開':'關'}`;
+      document.getElementById('btnDark').classList.toggle('on',darkOn); };
+    document.getElementById('copyDiag').onclick=()=>{
+      const t=document.getElementById('diagText').textContent;
+      if(navigator.clipboard) navigator.clipboard.writeText(t);
+      document.getElementById('copyDiag').textContent="已複製 ✓";
+      setTimeout(()=>{ const b=document.getElementById('copyDiag'); if(b) b.textContent="複製這句話"; },1600);
+    };
+    refreshGauges();
   }
 }
-
-// --- Harmony index ---
-function computeHarmony(time) {
-  if (perturbMode) {
-    return 0.5 + 0.4 * Math.sin(time * 0.5);
-  }
-  return 0.85 + 0.1 * Math.sin(time * 0.2);
+function killBody(b){ b.mesh.visible=false; b.glow.visible=false; b.trail.visible=false; b.bond.visible=false; b.alive=false; }
+function updateG2Note(){
+  const n=document.getElementById('g2Note'); if(!n) return;
+  if(gStar>=1.6) n.textContent="閉鎖形成：外圈消失，只剩內圈的擁護";
+  else if(gStar>=1.3) n.textContent="彗星被捕獲了：結構開始留得住人";
+  else if(gStar<=0.7) n.textContent="引力太弱：彗星飄走，場散了";
+  else n.textContent="適中：有結構，也留得住自轉的空間";
 }
 
-// --- HUD ---
-const fieldStatus = document.getElementById('field-status');
-const harmonyIndex = document.getElementById('harmony-index');
-const timeDisplay = document.getElementById('time-display');
-
-function updateHUD(time) {
-  const h = computeHarmony(time);
-  harmonyIndex.textContent = `協和指數：${h.toFixed(3)}`;
-  timeDisplay.textContent = `T + ${time.toFixed(2)}`;
-
-  if (perturbMode && perturbTimer < 5) {
-    fieldStatus.textContent = '場態：擾動中 — 穩場者介入';
-    fieldStatus.style.color = 'rgba(201, 160, 220, 0.8)';
-  } else if (perturbMode) {
-    fieldStatus.textContent = '場態：回歸穩態';
-    fieldStatus.style.color = 'rgba(160, 220, 180, 0.6)';
-  } else {
-    fieldStatus.textContent = '場態：穩態運行中';
-    fieldStatus.style.color = 'var(--text-dim)';
-  }
+// 場態統計
+function counts(){
+  const pool=[P1,P2,P3,...extraPlanets]; if(youBody) pool.push(youBody);
+  const inds=pool.filter(b=>b.alive!==false && b.mode==="orbit" && b.selfWeight>=.5).length;
+  let sats=satellites.filter(b=>b.alive!==false).length;
+  if(P2.mode==="sat") sats++;
+  if(youBody && youBody.alive!==false && youBody.mode==="sat") sats++;
+  return {nInd:inds, nSat:sats};
 }
 
-// --- Animate ---
-let frame = 0;
+// ---------- 測驗（十二題情境單選） ----------
+// 每個選項：[文字, 重力, 引力, 慣性, 力態]
+const QUESTIONS=[
+["團隊接到一個大案子，你的第一反應是？",[
+ ["先想整體方向，開始找人分工",.7,.65,.45,"主導"],
+ ["認領自己最能扛的那塊，把它做到好",.85,.45,.5,"獨立"],
+ ["先看誰壓力大，去補位協調",.7,.6,.5,"穩場"],
+ ["等大家分完，看剩下什麼再說",.3,.3,.6,"依附"]]],
+["你答應的事快做不完了，你會？",[
+ ["咬牙如期交出，自己吸收",.85,.45,.65,"穩場"],
+ ["提早講，重新約時程",.75,.55,.35,"獨立"],
+ ["先拖著，也許對方會忘記",.2,.3,.7,"游擇"],
+ ["找人幫忙分掉一部分",.45,.55,.45,"依附"]]],
+["到一個沒有熟人的聚會，你會？",[
+ ["主動開話題，很快聚起一圈人",.65,.85,.35,"主導"],
+ ["挑一個聊得來的深聊",.6,.55,.5,"獨立"],
+ ["待在邊上，等人來搭話",.4,.25,.6,"依附"],
+ ["每桌都晃一下，哪裡有趣去哪裡",.45,.5,.2,"游擇"]]],
+["團體宣布要換一套新的做事方法？",[
+ ["早該換了，我第一個試",.6,.5,.1,"挑釁"],
+ ["先看別人用得怎樣再說",.5,.4,.7,"角框"],
+ ["舊方法明明還能用，幹嘛換",.55,.4,.9,"角框"],
+ ["自己評估，有道理就換",.7,.45,.4,"獨立"]]],
+["會議上有人講了你不同意的方向？",[
+ ["當場提出不同意見",.75,.5,.35,"挑釁"],
+ ["會後私下找他聊",.65,.6,.5,"穩場"],
+ ["先跟著走，之後再看",.35,.35,.65,"依附"],
+ ["看場面上多數人挺誰",.4,.4,.6,"角框"]]],
+["最近三個月，你主動開局（約人、提案、發起）的次數？",[
+ ["很多次，習慣了",.75,.75,.4,"主導"],
+ ["有幾次",.65,.55,.45,"獨立"],
+ ["幾乎沒有，多半是被找",.45,.35,.6,"依附"],
+ ["想過很多次，都還沒真的做",.3,.35,.7,"游擇"]]],
+["朋友會怎麼形容你在群體裡的樣子？",[
+ ["帶方向的那個人",.75,.7,.5,"主導"],
+ ["自己把事做好的那個人",.8,.45,.5,"獨立"],
+ ["大家有事都會找的那個人",.7,.8,.55,"穩場"],
+ ["心情對了才出現的那個人",.4,.45,.2,"游擇"]]],
+["別人找你幫忙，跟你找別人幫忙，哪邊多？",[
+ ["別人找我多很多",.8,.8,.5,"穩場"],
+ ["差不多，互相",.65,.6,.45,"獨立"],
+ ["我找別人比較多",.3,.4,.5,"依附"],
+ ["我很少求助，也很少被找",.6,.2,.6,"獨立"]]],
+["一件堅持很久的事一直沒成果？",[
+ ["馬上換方向，不戀棧",.5,.45,.1,"游擇"],
+ ["檢視方法，調整了再試",.7,.5,.4,"獨立"],
+ ["再撐一下，快成了",.6,.4,.9,"角框"],
+ ["問身邊的人我該不該放",.35,.4,.55,"依附"]]],
+["團體裡吵起來了，你通常？",[
+ ["出面收拾場面，給結論",.75,.65,.5,"主導"],
+ ["把問題挑明，讓大家不能裝沒事",.65,.45,.3,"挑釁"],
+ ["居中緩衝，讓兩邊都有台階",.7,.65,.55,"穩場"],
+ ["離遠一點，等火燒完",.35,.3,.6,"游擇"]]],
+["你目前的生活重量（收入、情緒、時間），主要誰在扛？",[
+ ["幾乎全部自己扛",.9,.45,.55,"獨立"],
+ ["大部分自己，少部分靠人",.7,.5,.5,"穩場"],
+ ["一半一半",.5,.45,.5,"角框"],
+ ["主要靠某個人或某個組織撐著",.2,.35,.65,"依附"]]],
+["想像離開現在最主要的那個團體，你會？",[
+ ["麻煩，但很快能建立新軌道",.8,.55,.3,"獨立"],
+ ["其實早就想走了",.5,.4,.2,"游擇"],
+ ["不敢想，那裡是我的重心",.25,.4,.8,"依附"],
+ ["捨不得，但走了也能活",.6,.5,.6,"穩場"]]]
+];
+let qIdx=-1, qAns=[];
+const BODY_NAME={主導:"恆星",獨立:"行星",穩場:"拉格朗日點",角框:"共軌天體",依附:"衛星",游擇:"彗星",挑釁:"掠日小行星"};
+function lvName(v){ return v>=.65?"偏高":v>=.4?"中等":"偏低"; }
+const FORCE_READ={
+  g:{ 偏高:"此刻你扛得住自己的重量，是場裡能自轉的星。",
+      中等:"大致扛得住自己，壓力大的時候會想找個軌道靠一下。",
+      偏低:"此刻你的重量有一部分放在別人身上。這是狀態，會變：把一件小事完整扛完，就是把重力調回來的起手式。" },
+  a:{ 偏高:"你是別人想靠近的節點。留意重量掛上來的速度，別讓自己變成代償點。",
+      中等:"有人會被你吸引靠近，引力健康。",
+      偏低:"目前你的軌道比較安靜，被主動靠近的頻率不高。想調引力，先穩定出現在同一個場。" },
+  i:{ 偏高:"模式黏著度高。想改變的事，記得是持續施力，不是一次動作。",
+      中等:"能守也能換，改變需要一個說得通的理由。",
+      偏低:"換軌很快。留意有些軌道還沒待到開花，就先換了。" }
+};
+function computeProfile(){
+  let g=0,a=0,i=0; const spec={主導:0,獨立:0,穩場:0,角框:0,依附:0,游擇:0,挑釁:0};
+  qAns.forEach((ai,qi)=>{ const o=QUESTIONS[qi][1][ai]; g+=o[1]; a+=o[2]; i+=o[3]; spec[o[4]]++; });
+  const n=qAns.length;
+  return { g:g/n, a:a/n, i:i/n, spec };
+}
+function topForces(spec){
+  return Object.entries(spec).sort((x,y)=>y[1]-x[1]).filter(e=>e[1]>0).slice(0,2).map(e=>e[0]);
+}
+function spawnYou(p){
+  if(youBody) killBody(youBody);
+  youBody=makeBody({color:0xffe9b0, r:1.7+p.g*2.1, speed:.42, tilt:.05, phase:1.9, size:.08+p.a*.05});
+  youBody.selfWeight=p.g;
+  youBody.trailMax=Math.round(120+p.i*380);
+  youBody.highlight=true;
+}
+function reportText(p){
+  const tf=topForces(p.spec);
+  const lg=lvName(p.g), la=lvName(p.a), li=lvName(p.i);
+  return `人際場力學 · 我的星報告\n重力（自我承重）${p.g.toFixed(2)}（${lg}）：${FORCE_READ.g[lg]}\n引力（節點吸引）${p.a.toFixed(2)}（${la}）：${FORCE_READ.a[la]}\n慣性（模式黏著）${p.i.toFixed(2)}（${li}）：${FORCE_READ.i[li]}\n此刻傾向力態：${tf[0]}（${BODY_NAME[tf[0]]}）${tf[1]?`，其次 ${tf[1]}（${BODY_NAME[tf[1]]}）`:""}\n提醒：測的是「此刻的你 × 你選的那個場」，換一個場重測會不同。力態是狀態，不是人格。\n（十二題簡易自評，非正式量表，結果是起點不是判決）`;
+}
+function renderQuiz(){
+  const box=document.getElementById('quizBox'); if(!box) return;
+  if(qIdx<0){
+    box.innerHTML=`<button class="sbtn" id="qStart">開始測驗（12 題 · 約 3 分鐘）</button>
+      ${qAns.length===12?'<button class="sbtn" id="qSeeLast">看上次的報告</button>':''}`;
+    document.getElementById('qStart').onclick=()=>{ qIdx=0; qAns=[]; renderQuiz(); };
+    const sl=document.getElementById('qSeeLast'); if(sl) sl.onclick=()=>{ qIdx=12; renderQuiz(); };
+    return;
+  }
+  if(qIdx<12){
+    const [title,opts]=QUESTIONS[qIdx];
+    box.innerHTML=`<div class="qprog">第 ${qIdx+1} / 12 題</div>
+      <div class="qtitle">${title}</div>
+      <div class="qopts">${opts.map((o,k)=>`<button class="qopt" data-k="${k}">${o[0]}</button>`).join("")}</div>
+      ${qIdx>0?'<button class="sbtn qback" id="qBack">上一題</button>':''}`;
+    box.querySelectorAll('.qopt').forEach(b=>b.onclick=()=>{ qAns[qIdx]=+b.dataset.k; qIdx++; renderQuiz(); });
+    const bk=document.getElementById('qBack'); if(bk) bk.onclick=()=>{ qIdx--; renderQuiz(); };
+    return;
+  }
+  // 結果
+  const p=computeProfile();
+  spawnYou(p);
+  const tf=topForces(p.spec);
+  const lg=lvName(p.g), la=lvName(p.a), li=lvName(p.i);
+  const bar=(name,v,color,lv)=>`<div class="rline"><span class="rname">${name}</span><span class="rtrack"><i style="width:${Math.round(v*100)}%;background:${color}"></i></span><span class="rlv">${v.toFixed(2)} ${lv}</span></div>`;
+  box.innerHTML=`<div class="report">
+    ${bar("重力",p.g,"var(--star-c)",lg)}${bar("引力",p.a,"var(--planet-c)",la)}${bar("慣性",p.i,"var(--stab-c)",li)}
+    <div class="rtext">
+      <b>重力</b>：${FORCE_READ.g[lg]}<br>
+      <b>引力</b>：${FORCE_READ.a[la]}<br>
+      <b>慣性</b>：${FORCE_READ.i[li]}<br>
+      <b>此刻傾向</b>：${tf[0]}（${BODY_NAME[tf[0]]}）${tf[1]?`，其次 ${tf[1]}（${BODY_NAME[tf[1]]}）`:""}。
+      你的星（亮金色、會呼吸的那顆）已經放進上面的星系了${p.g<.3?"：重力偏低，它正繞著別的星轉，把自重扛回來它就會掙脫":""}。
+    </div>
+    <div class="ctrls" style="margin-top:14px">
+      <button class="sbtn" id="qCopy">複製報告</button>
+      <button class="sbtn" id="qRetry">重新作答</button>
+      <button class="sbtn" id="qLook">回星系看你的星</button>
+    </div>
+    <div class="rnote">測的是「此刻的你 × 你選的那個場」，換一個場重測會不同；力態是狀態，不是人格。十二題簡易自評，非正式量表，結果是起點不是判決。</div>
+  </div>`;
+  document.getElementById('qCopy').onclick=()=>{
+    if(navigator.clipboard) navigator.clipboard.writeText(reportText(p));
+    document.getElementById('qCopy').textContent="已複製 ✓";
+    setTimeout(()=>{ const b=document.getElementById('qCopy'); if(b) b.textContent="複製報告"; },1600);
+  };
+  document.getElementById('qRetry').onclick=()=>{ qIdx=0; qAns=[]; if(youBody){killBody(youBody); youBody=null;} renderQuiz(); };
+  document.getElementById('qLook').onclick=()=>gotoChap(0);
+}
 
-function animate() {
+// ---------- 全域重置 ----------
+function resetAll(){
+  gStar=1; perturbing=false; perturbT=0; awareness=false; holding=false; holdAcc=0; moved=false; darkOn=false;
+  P1.baseR=2.0; P1.curR=2.0;
+  P2.selfWeight=.8; P2.mode="orbit"; P2.satLerp=0; P2.host=null;
+  extraPlanets.forEach(killBody); extraPlanets=[];
+  satellites.forEach(killBody); satellites=[];
+  if(youBody){ killBody(youBody); youBody=null; }
+  qIdx=-1; qAns=[];
+  allBodies().forEach(b=>{ b.trailPts.length=0; b.trail.geometry.setDrawRange(0,0); });
+  simT=0;
+  gotoChap(chap);
+}
+document.getElementById('resetAll').addEventListener('click',resetAll);
+function refreshGauges(){
+  if(chap!==4) return;
+  const {nInd,nSat}=counts();
+  const st=fieldState(nInd,nSat,gStar), m=STATE_META[st];
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('gInd',nInd); set('gSat',nSat); set('gG',gStar.toFixed(2));
+  set('gH',harmonyOf(nInd,nSat,gStar,perturbing).toFixed(2));
+  const chipEl=document.getElementById('gState');
+  if(chipEl){ chipEl.textContent=m.label; chipEl.style.color=m.color; chipEl.style.borderColor=m.color; }
+  set('diagText',diagnosis(nInd,nSat,gStar));
+}
+
+// ---------- 第三章：持續施力 ----------
+let holding=false, holdAcc=0, moved=false;
+const HOLD_NEED=2.6, HOLD_NEED_AW=1.0;
+
+// ---------- 主迴圈 ----------
+let frame=0;
+function animate(){
   requestAnimationFrame(animate);
   frame++;
+  const dt=.008; simT+=dt;
+  if(perturbing){ perturbT+=dt; if(perturbT>6){ perturbing=false; } }
+  gStarShow += (gStar-gStarShow)*.03;
 
-  const dt = 0.008;
-  simTime += dt;
-  if (perturbMode) perturbTimer += dt;
+  if(!drag) tA+=.0008;
+  camA+=(tA-camA)*.04; camH+=(tH-camH)*.04; camR+=(tR-camR)*.04;
+  camera.position.set(Math.sin(camA)*camR, camH, Math.cos(camA)*camR);
+  camera.lookAt(0,0,0);
 
-  // Perturbation auto-recovery
-  if (perturbMode && perturbTimer > 8) {
-    perturbMode = false;
-    btnPerturb.classList.remove('active');
-  }
+  // 恆星：引力越大越亮越大
+  const sScale=1+.02*Math.sin(simT*.5)+(gStarShow-1)*.25;
+  starMesh.scale.setScalar(Math.max(.6,sScale));
+  starGlow.scale.setScalar(1.8*(1+(gStarShow-1)*.6+.05*Math.sin(simT*.3)));
 
-  // Camera
-  if (!isDrag) targetAngle += 0.0008;
-  camAngle += (targetAngle - camAngle) * 0.04;
-  camHeight += (targetHeight - camHeight) * 0.04;
-  camRadius += (targetRadius - camRadius) * 0.04;
-  camera.position.x = Math.sin(camAngle) * camRadius;
-  camera.position.z = Math.cos(camAngle) * camRadius;
-  camera.position.y = camHeight;
-  camera.lookAt(0, 0, 0);
+  const pert = perturbing ? .14 : 0;
 
-  // Leader — slight breathing
-  const leaderBreath = 1 + 0.02 * Math.sin(simTime * 0.5);
-  leaderMesh.scale.setScalar(leaderBreath);
-  leaderGlow.scale.setScalar(CONFIG.leader.glowSize * (1 + 0.05 * Math.sin(simTime * 0.3)));
+  // 行星（含 P2 與你的星的依附化邏輯）
+  const orbiters=[P1,P2,P3,...extraPlanets]; if(youBody) orbiters.push(youBody);
+  orbiters.forEach(b=>{
+    if(b.alive===false) return;
+    // 自重 → 晃動與衛星化（P2 有滑桿；你的星用測驗結果）
+    if(b===P2||b===youBody){
+      if(b.selfWeight<.3 && b.mode==="orbit"){ b.mode="satlerp"; b.host=P1; }
+      if(b.selfWeight>=.5 && (b.mode==="sat"||b.mode==="satlerp2")){ b.mode="unlerp"; }
+      b.wobble = b.mode==="orbit" ? Math.max(0,(0.55-b.selfWeight))*1.6+pert : pert;
+    } else b.wobble = pert + (darkOn && b===P3 ? .12 : 0);
 
-  // Highlight effects
-  const leaderHighlight = highlightedRole === 'leader' ? 0.4 : 0;
-  const indHighlight = highlightedRole === 'independent' ? 0.3 : 0;
-  const stabHighlight = highlightedRole === 'stabilizer' ? 0.4 : 0;
-
-  leaderGlow.scale.setScalar(CONFIG.leader.glowSize + leaderHighlight);
-
-  // Independents
-  CONFIG.independents.forEach((cfg, i) => {
-    const pos = getIndPosition(cfg, simTime);
-    indMeshes[i].position.copy(pos);
-    indGlows[i].position.copy(pos);
-    indGlows[i].scale.setScalar(0.35 + indHighlight);
-
-    // Bond line to leader
-    const bpos = bondLines[i].geometry.attributes.position.array;
-    bpos[0] = 0; bpos[1] = 0; bpos[2] = 0;
-    bpos[3] = pos.x; bpos[4] = pos.y; bpos[5] = pos.z;
-    bondLines[i].geometry.attributes.position.needsUpdate = true;
-
-    // Trail
-    if (frame % 3 === 0) {
-      indTrailData[i].push(pos.clone());
-      if (indTrailData[i].length > 500) indTrailData[i].shift();
-    }
-    const tpos = indTrails[i].geometry.attributes.position.array;
-    for (let j = 0; j < indTrailData[i].length; j++) {
-      tpos[j*3] = indTrailData[i][j].x;
-      tpos[j*3+1] = indTrailData[i][j].y;
-      tpos[j*3+2] = indTrailData[i][j].z;
-    }
-    indTrails[i].geometry.attributes.position.needsUpdate = true;
-    indTrails[i].geometry.setDrawRange(0, indTrailData[i].length);
-    indTrails[i].visible = showTrails;
+    let p;
+    if(b.mode==="orbit"){ p=orbitPos(b,simT); }
+    else if(b.mode==="satlerp"||b.mode==="sat"||b.mode==="satlerp2"||b.mode==="unlerp"){
+      const hostP=orbitPos(b.host,simT);
+      const sa=b.phase+simT*2.4;
+      const satP=new THREE.Vector3(hostP.x+Math.cos(sa)*.5, hostP.y+Math.sin(sa)*.12, hostP.z+Math.sin(sa)*.5);
+      if(b.mode==="satlerp"){ b.satLerp=Math.min(1,b.satLerp+dt*.55); if(b.satLerp>=1) b.mode="sat"; }
+      if(b.mode==="unlerp"){ b.satLerp=Math.max(0,b.satLerp-dt*.55); if(b.satLerp<=0) b.mode="orbit"; }
+      const own=orbitPos(b,simT);
+      p=own.lerp(satP,b.satLerp);
+    } else p=orbitPos(b,simT);
+    b.pos.copy(p);
   });
 
-  // Stabilizer
-  const stabPos = getStabilizerPosition(simTime);
-  stabMesh.position.copy(stabPos);
-  stabGlow.position.copy(stabPos);
-  stabGlow.scale.setScalar(0.5 + stabHighlight);
+  // 第三章：對 P1 持續施力
+  if(chap===3){
+    const need = awareness ? HOLD_NEED_AW : HOLD_NEED;
+    if(holding){
+      holdAcc=Math.min(need,holdAcc+dt);
+      P1.curR += (4.4-P1.curR)*.02;
+      if(holdAcc>=need && !moved){ moved=true; P1.baseR=4.4;
+        const n=document.getElementById('g3Note'); if(n) n.textContent= awareness ? "換軌完成。覺察力讓同樣的改變省了一大半力氣" : "換軌完成。這就是慣性的價格：持續施力，直到新模式成為家";
+      }
+    } else {
+      holdAcc=Math.max(0,holdAcc-dt*1.6);
+      if(!moved) P1.curR += (P1.baseR-P1.curR)*.05;
+    }
+    const arc=document.getElementById('holdArc');
+    if(arc) arc.style.strokeDashoffset=100.5*(1-holdAcc/need);
+  } else { if(!moved) P1.curR += (P1.baseR-P1.curR)*.05; holdAcc=0; }
 
-  // Stabilizer pulse ring
-  const stabRingScale = perturbMode
-    ? 1.5 + 0.8 * Math.sin(simTime * 3)
-    : 1 + 0.2 * Math.sin(simTime * 0.8);
-  stabRing.position.copy(stabPos);
-  stabRing.scale.setScalar(stabRingScale);
-  stabRing.lookAt(camera.position);
-  stabRingMat.opacity = perturbMode ? 0.35 : 0.12;
+  // 共軌天體：跟著局勢換邊
+  CO.curR = 2.0 + .8*Math.sin(simT*.18);
+  CO.pos.copy(orbitPos(CO,simT));
 
-  // Stabilizer visibility — more prominent during perturbation
-  const stabBaseOpacity = perturbMode ? 1.0 : 0.5;
-  stabMat.opacity = stabBaseOpacity;
-  stabMat.transparent = true;
-  stabGlowMat.opacity = perturbMode ? 0.8 : 0.3;
-
-  // Lagrange points
-  const lPoints = computeLagrangePoints(simTime);
-  for (let i = 0; i < 5; i++) {
-    lagrangeMarkers[i].sphere.position.copy(lPoints[i]);
-    lagrangeMarkers[i].ring.position.copy(lPoints[i]);
-    lagrangeMarkers[i].ring.lookAt(camera.position);
-    lagrangeMarkers[i].sphere.visible = showLagrange;
-    lagrangeMarkers[i].ring.visible = showLagrange;
+  // 彗星：拉長軌道 / 捕獲 / 飄走
+  let targetE=.65, targetA=4.2, cmFade=1;
+  if(gStarShow>=1.3){ targetE=.08; targetA=1.7; }
+  if(gStarShow<=0.7){ targetE=.8; targetA=6.5; cmFade=.35; }
+  CM.eccShow+=(targetE-CM.eccShow)*.02; CM.aShow+=(targetA-CM.aShow)*.02;
+  {
+    const a=CM.phase+simT*CM.speed;
+    const r=CM.aShow*(1-CM.eccShow*CM.eccShow)/(1+CM.eccShow*Math.cos(a));
+    CM.pos.set(Math.cos(a)*r, Math.sin(a*.5)*CM.tilt*2, Math.sin(a)*r);
+    CM.mesh.material.opacity=cmFade; CM.trail.material.opacity=.45*cmFade;
   }
 
-  // Field lines
-  computeFieldLines(simTime);
+  // 掠日小行星
+  AS.pos.copy(orbitPos(AS,simT));
 
-  // Stars
-  starMat.uniforms.time.value = performance.now() * 0.001;
+  // 暗質量
+  DK.pos.copy(orbitPos(DK,simT));
+  dkRing.position.copy(DK.pos); dkRing.lookAt(camera.position);
+  dkRing.material.opacity = darkOn ? .42+.12*Math.sin(simT*2) : 0;
+  DK.mesh.visible=false;
 
-  // HUD
-  if (frame % 8 === 0) updateHUD(simTime);
+  // 衛星（終章新增的依附）
+  satellites.forEach((b,i)=>{
+    if(b.alive===false) return;
+    const hostP=b.host.pos;
+    const sa=b.phase+simT*b.speed;
+    b.pos.set(hostP.x+Math.cos(sa)*b.baseR, hostP.y+Math.sin(sa)*.1, hostP.z+Math.sin(sa)*b.baseR);
+  });
 
-  renderer.render(scene, camera);
+  // 穩場者：跟隨 P1 的 L4，代償多時過載變亮
+  {
+    const {nSat}=counts();
+    const a=P1.phase+simT*P1.speed*Math.pow(gStarShow,.85)+Math.PI/3;
+    const r=(P1.curR/Math.pow(gStarShow,.85))+( (perturbing||nSat>=2) ? .25*Math.sin(simT*.9) : .05*Math.sin(simT*.3));
+    stab.pos.set(Math.cos(a)*r, .1*Math.sin(simT*.4), Math.sin(a)*r);
+    const stressed=perturbing||nSat>=2;
+    const lockGone = gStarShow>=1.55;
+    stab.mesh.visible=!lockGone; stab.glow.visible=!lockGone; stabRing.visible=!lockGone;
+    stabRing.position.copy(stab.pos); stabRing.lookAt(camera.position);
+    stabRing.scale.setScalar(stressed?1.5+.7*Math.sin(simT*3):1+.2*Math.sin(simT*.8));
+    stabRingMat.opacity=stressed?.4:.14;
+  }
+
+  // 套用位置、拖尾、連線
+  allBodies().forEach(b=>{
+    if(b.alive===false||b===DK) { if(b===DK) return; return; }
+    b.mesh.position.copy(b.pos); b.glow.position.copy(b.pos);
+    if(b.highlight){ b.glow.scale.setScalar(b.size*7.5*(1.6+.4*Math.sin(simT*4))); }
+    else b.glow.scale.setScalar(b.size*7.5);
+    if(frame%3===0){ b.trailPts.push(b.pos.clone()); if(b.trailPts.length>(b.trailMax||420)) b.trailPts.shift(); }
+    const tp=b.trail.geometry.attributes.position.array;
+    for(let j=0;j<b.trailPts.length;j++){ tp[j*3]=b.trailPts[j].x; tp[j*3+1]=b.trailPts[j].y; tp[j*3+2]=b.trailPts[j].z; }
+    b.trail.geometry.attributes.position.needsUpdate=true;
+    b.trail.geometry.setDrawRange(0,b.trailPts.length);
+    // 依附連線
+    let bondTarget=null, bondOp=0;
+    if(b.mode==="sat"||b.mode==="satlerp"||b.mode==="satlerp2"||b.mode==="unlerp"){ bondTarget=b.host.pos; bondOp=.5*b.satLerp; }
+    if(b===P3&&darkOn){ bondTarget=DK.pos; bondOp=.32; }
+    if(bondTarget){
+      const bp=b.bond.geometry.attributes.position.array;
+      bp[0]=bondTarget.x;bp[1]=bondTarget.y;bp[2]=bondTarget.z;bp[3]=b.pos.x;bp[4]=b.pos.y;bp[5]=b.pos.z;
+      b.bond.geometry.attributes.position.needsUpdate=true;
+      b.bond.material.opacity=bondOp;
+    } else b.bond.material.opacity=0;
+  });
+
+  starMat.uniforms.time.value=performance.now()*.001;
+
+  // HUD 與儀表
+  if(frame%10===0){
+    const {nInd,nSat}=counts();
+    const st=fieldState(nInd,nSat,gStar), m=STATE_META[st];
+    const h=harmonyOf(nInd,nSat,gStar,perturbing);
+    const el=document.getElementById('hudState');
+    el.textContent=`場態：${m.label}${perturbing?"（擾動中）":""}`; el.style.color=m.color;
+    document.getElementById('hudHarmony').textContent=`協和指數：${h.toFixed(3)}`;
+    document.getElementById('hudTime').textContent=`T + ${simT.toFixed(2)}`;
+    refreshGauges();
+  }
+  renderer.render(scene,camera);
 }
+addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
 
-// --- Resize ---
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+// 圖鑑
+document.getElementById('dexToggle').addEventListener('click',()=>{
+  document.getElementById('dex').classList.toggle('open');
+  document.getElementById('dexToggle').classList.toggle('on');
 });
 
-// --- Start ---
+gotoChap(0);
 animate();
 </script>
 </body>
