@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人際場力學 — 星系平衡模型</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&display=swap');
+
+  :root {
+    --leader-color: #ffb347;
+    --leader-glow: rgba(255, 179, 71, 0.6);
+    --independent-color: #6ec6ff;
+    --independent-glow: rgba(110, 198, 255, 0.4);
+    --stabilizer-color: #c9a0dc;
+    --stabilizer-glow: rgba(201, 160, 220, 0.5);
+    --bg-deep: #060810;
+    --text-dim: rgba(200, 210, 230, 0.5);
+    --text-mid: rgba(200, 210, 230, 0.75);
+    --text-bright: rgba(230, 235, 245, 0.9);
+    --border-subtle: rgba(140, 160, 200, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    overflow: hidden;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--text-mid);
+    cursor: default;
+  }
+
+  #canvas-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 1;
+  }
+
+  /* Grain overlay */
+  .grain {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* Title block */
+  .title-block {
+    position: fixed;
+    top: 28px; left: 36px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .title-main {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: rgba(200, 180, 160, 0.7);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .title-sub {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--text-bright);
+    margin-bottom: 4px;
+  }
+
+  .title-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+
+  /* Role cards */
+  .role-cards {
+    position: fixed;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    pointer-events: auto;
+  }
+
+  .role-card {
+    background: rgba(8, 12, 22, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    padding: 16px 20px;
+    min-width: 200px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .role-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    transition: all 0.4s ease;
+  }
+
+  .role-card[data-role="leader"]::before { background: var(--leader-color); }
+  .role-card[data-role="independent"]::before { background: var(--independent-color); }
+  .role-card[data-role="stabilizer"]::before { background: var(--stabilizer-color); }
+
+  .role-card:hover {
+    background: rgba(15, 20, 35, 0.9);
+    border-color: rgba(140, 160, 200, 0.25);
+    transform: translateX(-4px);
+  }
+
+  .role-card.active {
+    border-color: rgba(140, 160, 200, 0.3);
+  }
+
+  .role-card .role-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .role-card[data-role="leader"] .role-label { color: var(--leader-color); }
+  .role-card[data-role="independent"] .role-label { color: var(--independent-color); }
+  .role-card[data-role="stabilizer"] .role-label { color: var(--stabilizer-color); }
+
+  .role-card .role-name {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+
+  .role-card .role-desc {
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  .role-card .role-astro {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 10px;
+    font-style: italic;
+    color: rgba(180, 170, 160, 0.4);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* Info panel - bottom left */
+  .info-panel {
+    position: fixed;
+    bottom: 28px; left: 36px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .info-line {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    line-height: 2;
+  }
+
+  /* Controls */
+  .controls {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 6px;
+    pointer-events: auto;
+  }
+
+  .ctrl-btn {
+    background: rgba(12, 16, 28, 0.75);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-dim);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(25, 30, 50, 0.8);
+    border-color: rgba(140, 160, 200, 0.3);
+    color: var(--text-bright);
+  }
+
+  .ctrl-btn.active {
+    background: rgba(30, 40, 65, 0.6);
+    border-color: rgba(140, 160, 200, 0.35);
+    color: var(--text-bright);
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    z-index: 20;
+    background: rgba(8, 12, 22, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    padding: 14px 18px;
+    max-width: 260px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-mid);
+    letter-spacing: 0.5px;
+  }
+
+  .tooltip.visible { opacity: 1; }
+
+  /* Corner accents */
+  .corner-accent {
+    position: fixed;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .corner-accent.tl { top: 16px; left: 16px; width: 50px; height: 50px; border-top: 1px solid rgba(200,180,160,0.1); border-left: 1px solid rgba(200,180,160,0.1); }
+  .corner-accent.br { bottom: 16px; right: 16px; width: 50px; height: 50px; border-bottom: 1px solid rgba(200,180,160,0.1); border-right: 1px solid rgba(200,180,160,0.1); }
+
+  /* Horizontal rule decoration */
+  .title-block .rule {
+    width: 40px;
+    height: 1px;
+    background: rgba(200, 180, 160, 0.2);
+    margin: 10px 0;
+  }
+
+  @media (max-width: 768px) {
+    .role-cards {
+      right: 12px;
+      top: auto;
+      bottom: 70px;
+      transform: none;
+      flex-direction: row;
+      gap: 8px;
+    }
+    .role-card {
+      min-width: auto;
+      padding: 10px 14px;
+    }
+    .role-card .role-desc, .role-card .role-astro { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+<div class="grain"></div>
+
+<div class="corner-accent tl"></div>
+<div class="corner-accent br"></div>
+
+<!-- Title -->
+<div class="title-block">
+  <div class="title-main">Interpersonal Field Dynamics</div>
+  <div class="title-sub">星系平衡模型</div>
+  <div class="rule"></div>
+  <div class="title-desc">Galaxy Equilibrium — Stable Field Configuration</div>
+</div>
+
+<!-- Role cards -->
+<div class="role-cards">
+  <div class="role-card active" data-role="leader">
+    <div class="role-label">Central Mass</div>
+    <div class="role-name">主導者</div>
+    <div class="role-desc">提供中心引力與方向<br>由獨立者自然浮現</div>
+    <div class="role-astro">— Analogous to the primary star</div>
+  </div>
+  <div class="role-card" data-role="independent">
+    <div class="role-label">Orbiting Bodies</div>
+    <div class="role-name">獨立者</div>
+    <div class="role-desc">各循軌道自行運轉<br>承擔自身重量與責任</div>
+    <div class="role-astro">— Analogous to planetary bodies</div>
+  </div>
+  <div class="role-card" data-role="stabilizer">
+    <div class="role-label">Lagrange Point</div>
+    <div class="role-name">穩場者</div>
+    <div class="role-desc">感知張力，微調平衡<br>必要時出現，穩定後退場</div>
+    <div class="role-astro">— Analogous to Lagrange equilibrium</div>
+  </div>
+</div>
+
+<!-- Info -->
+<div class="info-panel">
+  <div class="info-line" id="field-status">場態：穩態運行中</div>
+  <div class="info-line" id="harmony-index">協和指數：0.000</div>
+  <div class="info-line" id="time-display">T + 0.000</div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="ctrl-btn active" id="btn-trails">軌跡</button>
+  <button class="ctrl-btn" id="btn-field">力場</button>
+  <button class="ctrl-btn" id="btn-lagrange">拉格朗日點</button>
+  <button class="ctrl-btn" id="btn-perturb">擾動</button>
+  <button class="ctrl-btn" id="btn-reset">重置</button>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// =============================================
+// 人際場力學 — 星系平衡模型 3D Visualization
+// =============================================
+
+// --- Config ---
+const CONFIG = {
+  leader: {
+    mass: 3.0,
+    color: 0xffb347,
+    radius: 0.18,
+    glowSize: 1.8,
+    label: '主導者'
+  },
+  independents: [
+    { mass: 0.3, color: 0x6ec6ff, orbitRadius: 1.8, orbitSpeed: 0.6, orbitTilt: 0.1, phase: 0 },
+    { mass: 0.25, color: 0x5db8f0, orbitRadius: 2.5, orbitSpeed: 0.4, orbitTilt: -0.15, phase: 2.1 },
+    { mass: 0.28, color: 0x7dd4ff, orbitRadius: 3.2, orbitSpeed: 0.3, orbitTilt: 0.08, phase: 4.2 },
+    { mass: 0.22, color: 0x88dcff, orbitRadius: 2.1, orbitSpeed: 0.5, orbitTilt: -0.05, phase: 1.0 },
+    { mass: 0.26, color: 0x5ebaee, orbitRadius: 3.8, orbitSpeed: 0.22, orbitTilt: 0.2, phase: 3.5 },
+  ],
+  stabilizer: {
+    mass: 0.15,
+    color: 0xc9a0dc,
+    radius: 0.07,
+    label: '穩場者'
+  }
+};
+
+let showTrails = true;
+let showField = false;
+let showLagrange = false;
+let perturbMode = false;
+let perturbTimer = 0;
+let simTime = 0;
+
+// --- Three.js ---
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+camera.position.set(0, 5, 9);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+container.appendChild(renderer.domElement);
+
+// --- Starfield ---
+const starGeo = new THREE.BufferGeometry();
+const starCount = 2500;
+const starPos = new Float32Array(starCount * 3);
+const starSizes = new Float32Array(starCount);
+for (let i = 0; i < starCount; i++) {
+  starPos[i*3] = (Math.random()-0.5) * 200;
+  starPos[i*3+1] = (Math.random()-0.5) * 200;
+  starPos[i*3+2] = (Math.random()-0.5) * 200;
+  starSizes[i] = Math.random() * 1.2 + 0.2;
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
+
+const starMat = new THREE.ShaderMaterial({
+  uniforms: { time: { value: 0 } },
+  vertexShader: `
+    attribute float size;
+    uniform float time;
+    varying float vAlpha;
+    void main() {
+      vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = size * (60.0 / -mvPos.z);
+      gl_Position = projectionMatrix * mvPos;
+      vAlpha = 0.3 + 0.5 * sin(time * 0.3 + position.x * 0.05 + position.y * 0.08);
+    }
+  `,
+  fragmentShader: `
+    varying float vAlpha;
+    void main() {
+      float d = length(gl_PointCoord - 0.5);
+      if (d > 0.5) discard;
+      float alpha = smoothstep(0.5, 0.0, d) * vAlpha;
+      gl_FragColor = vec4(0.8, 0.82, 0.9, alpha);
+    }
+  `,
+  transparent: true, depthWrite: false
+});
+scene.add(new THREE.Points(starGeo, starMat));
+
+// --- Glow texture ---
+function makeGlow(color, intensity) {
+  const s = 256;
+  const c = document.createElement('canvas');
+  c.width = s; c.height = s;
+  const ctx = c.getContext('2d');
+  const r = Math.floor(((color >> 16) & 0xff));
+  const g = Math.floor(((color >> 8) & 0xff));
+  const b = Math.floor((color & 0xff));
+  const grad = ctx.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  grad.addColorStop(0, `rgba(${r},${g},${b},${intensity})`);
+  grad.addColorStop(0.2, `rgba(${r},${g},${b},${intensity*0.5})`);
+  grad.addColorStop(0.5, `rgba(${r},${g},${b},${intensity*0.15})`);
+  grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,s,s);
+  return new THREE.CanvasTexture(c);
+}
+
+// --- Leader (主導者) ---
+const leaderGeo = new THREE.SphereGeometry(CONFIG.leader.radius, 48, 48);
+const leaderMat = new THREE.MeshBasicMaterial({ color: CONFIG.leader.color });
+const leaderMesh = new THREE.Mesh(leaderGeo, leaderMat);
+scene.add(leaderMesh);
+
+const leaderGlowMat = new THREE.SpriteMaterial({
+  map: makeGlow(CONFIG.leader.color, 0.7),
+  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+});
+const leaderGlow = new THREE.Sprite(leaderGlowMat);
+leaderGlow.scale.set(CONFIG.leader.glowSize, CONFIG.leader.glowSize, 1);
+scene.add(leaderGlow);
+
+// Secondary inner glow
+const leaderGlow2Mat = new THREE.SpriteMaterial({
+  map: makeGlow(0xffeedd, 0.4),
+  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+});
+const leaderGlow2 = new THREE.Sprite(leaderGlow2Mat);
+leaderGlow2.scale.set(0.7, 0.7, 1);
+scene.add(leaderGlow2);
+
+// --- Independents (獨立者) ---
+const indMeshes = [];
+const indGlows = [];
+const indTrails = [];
+const indTrailData = [];
+
+CONFIG.independents.forEach((cfg, i) => {
+  // Body
+  const geo = new THREE.SphereGeometry(0.06, 24, 24);
+  const mat = new THREE.MeshBasicMaterial({ color: cfg.color });
+  const mesh = new THREE.Mesh(geo, mat);
+  scene.add(mesh);
+  indMeshes.push(mesh);
+
+  // Glow
+  const glowMat = new THREE.SpriteMaterial({
+    map: makeGlow(cfg.color, 0.5),
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const glow = new THREE.Sprite(glowMat);
+  glow.scale.set(0.35, 0.35, 1);
+  scene.add(glow);
+  indGlows.push(glow);
+
+  // Orbit ring (subtle)
+  const orbitGeo = new THREE.RingGeometry(cfg.orbitRadius - 0.005, cfg.orbitRadius + 0.005, 128);
+  const orbitMat = new THREE.MeshBasicMaterial({
+    color: cfg.color, transparent: true, opacity: 0.06, side: THREE.DoubleSide
+  });
+  const orbitMesh = new THREE.Mesh(orbitGeo, orbitMat);
+  orbitMesh.rotation.x = -Math.PI / 2 + cfg.orbitTilt;
+  scene.add(orbitMesh);
+
+  // Trail
+  const trailGeo = new THREE.BufferGeometry();
+  const trailPositions = new Float32Array(1500 * 3);
+  trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+  trailGeo.setDrawRange(0, 0);
+  const trailMat = new THREE.LineBasicMaterial({
+    color: cfg.color, transparent: true, opacity: 0.25
+  });
+  const trailLine = new THREE.Line(trailGeo, trailMat);
+  scene.add(trailLine);
+  indTrails.push(trailLine);
+  indTrailData.push([]);
+});
+
+// --- Stabilizer (穩場者) ---
+const stabGeo = new THREE.SphereGeometry(CONFIG.stabilizer.radius, 24, 24);
+const stabMat = new THREE.MeshBasicMaterial({ color: CONFIG.stabilizer.color });
+const stabMesh = new THREE.Mesh(stabGeo, stabMat);
+scene.add(stabMesh);
+
+const stabGlowMat = new THREE.SpriteMaterial({
+  map: makeGlow(CONFIG.stabilizer.color, 0.6),
+  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+});
+const stabGlow = new THREE.Sprite(stabGlowMat);
+stabGlow.scale.set(0.5, 0.5, 1);
+scene.add(stabGlow);
+
+// Stabilizer pulsing ring
+const stabRingGeo = new THREE.RingGeometry(0.12, 0.14, 48);
+const stabRingMat = new THREE.MeshBasicMaterial({
+  color: CONFIG.stabilizer.color, transparent: true, opacity: 0.2, side: THREE.DoubleSide
+});
+const stabRing = new THREE.Mesh(stabRingGeo, stabRingMat);
+scene.add(stabRing);
+
+// --- Lagrange points visualization ---
+const lagrangeMarkers = [];
+const lagrangeLabels = ['L1', 'L2', 'L3', 'L4', 'L5'];
+for (let i = 0; i < 5; i++) {
+  const markerGeo = new THREE.SphereGeometry(0.03, 16, 16);
+  const markerMat = new THREE.MeshBasicMaterial({
+    color: 0xc9a0dc, transparent: true, opacity: 0.5
+  });
+  const marker = new THREE.Mesh(markerGeo, markerMat);
+  marker.visible = false;
+  scene.add(marker);
+
+  // Dashed ring around marker
+  const ringGeo = new THREE.RingGeometry(0.06, 0.065, 32);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xc9a0dc, transparent: true, opacity: 0.25, side: THREE.DoubleSide
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.visible = false;
+  scene.add(ring);
+
+  lagrangeMarkers.push({ sphere: marker, ring: ring });
+}
+
+// --- Force field lines ---
+const fieldLines = [];
+const fieldLineCount = 24;
+for (let i = 0; i < fieldLineCount; i++) {
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(60 * 3);
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setDrawRange(0, 0);
+  const mat = new THREE.LineBasicMaterial({
+    color: 0xffb347, transparent: true, opacity: 0.06
+  });
+  const line = new THREE.Line(geo, mat);
+  line.visible = false;
+  scene.add(line);
+  fieldLines.push(line);
+}
+
+// --- Connection lines (gravitational bonds) ---
+const bondLines = [];
+for (let i = 0; i < CONFIG.independents.length; i++) {
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(6);
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.LineBasicMaterial({
+    color: CONFIG.independents[i].color, transparent: true, opacity: 0.05
+  });
+  const line = new THREE.Line(geo, mat);
+  scene.add(line);
+  bondLines.push(line);
+}
+
+// --- Camera control ---
+let camAngle = 0;
+let camRadius = 9;
+let camHeight = 5;
+let targetAngle = 0;
+let targetRadius = 9;
+let targetHeight = 5;
+let isDrag = false;
+let prevM = { x: 0, y: 0 };
+
+renderer.domElement.addEventListener('mousedown', e => { isDrag = true; prevM = { x: e.clientX, y: e.clientY }; });
+renderer.domElement.addEventListener('mousemove', e => {
+  if (!isDrag) return;
+  targetAngle += (e.clientX - prevM.x) * 0.004;
+  targetHeight += (e.clientY - prevM.y) * 0.015;
+  targetHeight = Math.max(-3, Math.min(12, targetHeight));
+  prevM = { x: e.clientX, y: e.clientY };
+});
+renderer.domElement.addEventListener('mouseup', () => isDrag = false);
+renderer.domElement.addEventListener('mouseleave', () => isDrag = false);
+renderer.domElement.addEventListener('wheel', e => {
+  targetRadius += e.deltaY * 0.005;
+  targetRadius = Math.max(3, Math.min(18, targetRadius));
+});
+
+// Touch
+renderer.domElement.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) { isDrag = true; prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
+});
+renderer.domElement.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (isDrag && e.touches.length === 1) {
+    targetAngle += (e.touches[0].clientX - prevM.x) * 0.004;
+    targetHeight += (e.touches[0].clientY - prevM.y) * 0.015;
+    targetHeight = Math.max(-3, Math.min(12, targetHeight));
+    prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+}, { passive: false });
+renderer.domElement.addEventListener('touchend', () => isDrag = false);
+
+// --- UI ---
+const btnTrails = document.getElementById('btn-trails');
+const btnField = document.getElementById('btn-field');
+const btnLagrange = document.getElementById('btn-lagrange');
+const btnPerturb = document.getElementById('btn-perturb');
+const btnReset = document.getElementById('btn-reset');
+
+btnTrails.addEventListener('click', () => { showTrails = !showTrails; btnTrails.classList.toggle('active', showTrails); });
+btnField.addEventListener('click', () => { showField = !showField; btnField.classList.toggle('active', showField); });
+btnLagrange.addEventListener('click', () => { showLagrange = !showLagrange; btnLagrange.classList.toggle('active', showLagrange); });
+btnPerturb.addEventListener('click', () => {
+  perturbMode = true;
+  perturbTimer = 0;
+  btnPerturb.classList.add('active');
+});
+btnReset.addEventListener('click', () => {
+  perturbMode = false;
+  perturbTimer = 0;
+  btnPerturb.classList.remove('active');
+  for (let td of indTrailData) td.length = 0;
+  simTime = 0;
+});
+
+// Role card hover
+document.querySelectorAll('.role-card').forEach(card => {
+  card.addEventListener('mouseenter', () => {
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    highlightRole(card.dataset.role);
+  });
+});
+
+let highlightedRole = null;
+function highlightRole(role) {
+  highlightedRole = role;
+  setTimeout(() => { if (highlightedRole === role) highlightedRole = null; }, 3000);
+}
+
+// --- Compute positions ---
+function getIndPosition(cfg, time) {
+  const speed = perturbMode
+    ? cfg.orbitSpeed * (1 + 0.3 * Math.sin(time * 1.5 + cfg.phase))
+    : cfg.orbitSpeed;
+  const angle = cfg.phase + time * speed;
+  const wobble = perturbMode ? 0.15 * Math.sin(time * 2 + cfg.phase * 3) : 0;
+  const r = cfg.orbitRadius + wobble;
+  const x = Math.cos(angle) * r;
+  const z = Math.sin(angle) * r;
+  const y = Math.sin(angle * 0.5) * cfg.orbitTilt * cfg.orbitRadius;
+  return new THREE.Vector3(x, y, z);
+}
+
+function getStabilizerPosition(time) {
+  // Stabilizer orbits at a Lagrange-like point, roughly 60 degrees ahead of the largest independent
+  const baseAngle = CONFIG.independents[0].phase + time * CONFIG.independents[0].orbitSpeed + Math.PI / 3;
+  const r = CONFIG.independents[0].orbitRadius;
+  const breathe = perturbMode ? 0.3 * Math.sin(time * 0.8) : 0.05 * Math.sin(time * 0.3);
+  const x = Math.cos(baseAngle) * (r + breathe);
+  const z = Math.sin(baseAngle) * (r + breathe);
+  const y = 0.1 * Math.sin(time * 0.4);
+  return new THREE.Vector3(x, y, z);
+}
+
+function computeLagrangePoints(time) {
+  // Simplified L-point positions relative to leader and largest independent
+  const ind0Pos = getIndPosition(CONFIG.independents[0], time);
+  const dir = ind0Pos.clone().normalize();
+  const r = ind0Pos.length();
+
+  const points = [];
+  // L1: between leader and ind0
+  points.push(dir.clone().multiplyScalar(r * 0.65));
+  // L2: beyond ind0
+  points.push(dir.clone().multiplyScalar(r * 1.2));
+  // L3: opposite side
+  points.push(dir.clone().multiplyScalar(-r * 0.95));
+  // L4: 60 degrees ahead
+  const a4 = Math.atan2(dir.z, dir.x) + Math.PI / 3;
+  points.push(new THREE.Vector3(Math.cos(a4) * r, 0, Math.sin(a4) * r));
+  // L5: 60 degrees behind
+  const a5 = Math.atan2(dir.z, dir.x) - Math.PI / 3;
+  points.push(new THREE.Vector3(Math.cos(a5) * r, 0, Math.sin(a5) * r));
+
+  return points;
+}
+
+function computeFieldLines(time) {
+  for (let i = 0; i < fieldLineCount; i++) {
+    const angle = (i / fieldLineCount) * Math.PI * 2;
+    const pts = fieldLines[i].geometry.attributes.position.array;
+    const steps = 20;
+    for (let j = 0; j < steps; j++) {
+      const r = 0.3 + j * 0.25;
+      const spiralAngle = angle + j * 0.08 + time * 0.1;
+      pts[j*3] = Math.cos(spiralAngle) * r;
+      pts[j*3+1] = Math.sin(time * 0.2 + j * 0.1) * 0.1;
+      pts[j*3+2] = Math.sin(spiralAngle) * r;
+    }
+    fieldLines[i].geometry.attributes.position.needsUpdate = true;
+    fieldLines[i].geometry.setDrawRange(0, steps);
+    fieldLines[i].visible = showField;
+  }
+}
+
+// --- Harmony index ---
+function computeHarmony(time) {
+  if (perturbMode) {
+    return 0.5 + 0.4 * Math.sin(time * 0.5);
+  }
+  return 0.85 + 0.1 * Math.sin(time * 0.2);
+}
+
+// --- HUD ---
+const fieldStatus = document.getElementById('field-status');
+const harmonyIndex = document.getElementById('harmony-index');
+const timeDisplay = document.getElementById('time-display');
+
+function updateHUD(time) {
+  const h = computeHarmony(time);
+  harmonyIndex.textContent = `協和指數：${h.toFixed(3)}`;
+  timeDisplay.textContent = `T + ${time.toFixed(2)}`;
+
+  if (perturbMode && perturbTimer < 5) {
+    fieldStatus.textContent = '場態：擾動中 — 穩場者介入';
+    fieldStatus.style.color = 'rgba(201, 160, 220, 0.8)';
+  } else if (perturbMode) {
+    fieldStatus.textContent = '場態：回歸穩態';
+    fieldStatus.style.color = 'rgba(160, 220, 180, 0.6)';
+  } else {
+    fieldStatus.textContent = '場態：穩態運行中';
+    fieldStatus.style.color = 'var(--text-dim)';
+  }
+}
+
+// --- Animate ---
+let frame = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  frame++;
+
+  const dt = 0.008;
+  simTime += dt;
+  if (perturbMode) perturbTimer += dt;
+
+  // Perturbation auto-recovery
+  if (perturbMode && perturbTimer > 8) {
+    perturbMode = false;
+    btnPerturb.classList.remove('active');
+  }
+
+  // Camera
+  if (!isDrag) targetAngle += 0.0008;
+  camAngle += (targetAngle - camAngle) * 0.04;
+  camHeight += (targetHeight - camHeight) * 0.04;
+  camRadius += (targetRadius - camRadius) * 0.04;
+  camera.position.x = Math.sin(camAngle) * camRadius;
+  camera.position.z = Math.cos(camAngle) * camRadius;
+  camera.position.y = camHeight;
+  camera.lookAt(0, 0, 0);
+
+  // Leader — slight breathing
+  const leaderBreath = 1 + 0.02 * Math.sin(simTime * 0.5);
+  leaderMesh.scale.setScalar(leaderBreath);
+  leaderGlow.scale.setScalar(CONFIG.leader.glowSize * (1 + 0.05 * Math.sin(simTime * 0.3)));
+
+  // Highlight effects
+  const leaderHighlight = highlightedRole === 'leader' ? 0.4 : 0;
+  const indHighlight = highlightedRole === 'independent' ? 0.3 : 0;
+  const stabHighlight = highlightedRole === 'stabilizer' ? 0.4 : 0;
+
+  leaderGlow.scale.setScalar(CONFIG.leader.glowSize + leaderHighlight);
+
+  // Independents
+  CONFIG.independents.forEach((cfg, i) => {
+    const pos = getIndPosition(cfg, simTime);
+    indMeshes[i].position.copy(pos);
+    indGlows[i].position.copy(pos);
+    indGlows[i].scale.setScalar(0.35 + indHighlight);
+
+    // Bond line to leader
+    const bpos = bondLines[i].geometry.attributes.position.array;
+    bpos[0] = 0; bpos[1] = 0; bpos[2] = 0;
+    bpos[3] = pos.x; bpos[4] = pos.y; bpos[5] = pos.z;
+    bondLines[i].geometry.attributes.position.needsUpdate = true;
+
+    // Trail
+    if (frame % 3 === 0) {
+      indTrailData[i].push(pos.clone());
+      if (indTrailData[i].length > 500) indTrailData[i].shift();
+    }
+    const tpos = indTrails[i].geometry.attributes.position.array;
+    for (let j = 0; j < indTrailData[i].length; j++) {
+      tpos[j*3] = indTrailData[i][j].x;
+      tpos[j*3+1] = indTrailData[i][j].y;
+      tpos[j*3+2] = indTrailData[i][j].z;
+    }
+    indTrails[i].geometry.attributes.position.needsUpdate = true;
+    indTrails[i].geometry.setDrawRange(0, indTrailData[i].length);
+    indTrails[i].visible = showTrails;
+  });
+
+  // Stabilizer
+  const stabPos = getStabilizerPosition(simTime);
+  stabMesh.position.copy(stabPos);
+  stabGlow.position.copy(stabPos);
+  stabGlow.scale.setScalar(0.5 + stabHighlight);
+
+  // Stabilizer pulse ring
+  const stabRingScale = perturbMode
+    ? 1.5 + 0.8 * Math.sin(simTime * 3)
+    : 1 + 0.2 * Math.sin(simTime * 0.8);
+  stabRing.position.copy(stabPos);
+  stabRing.scale.setScalar(stabRingScale);
+  stabRing.lookAt(camera.position);
+  stabRingMat.opacity = perturbMode ? 0.35 : 0.12;
+
+  // Stabilizer visibility — more prominent during perturbation
+  const stabBaseOpacity = perturbMode ? 1.0 : 0.5;
+  stabMat.opacity = stabBaseOpacity;
+  stabMat.transparent = true;
+  stabGlowMat.opacity = perturbMode ? 0.8 : 0.3;
+
+  // Lagrange points
+  const lPoints = computeLagrangePoints(simTime);
+  for (let i = 0; i < 5; i++) {
+    lagrangeMarkers[i].sphere.position.copy(lPoints[i]);
+    lagrangeMarkers[i].ring.position.copy(lPoints[i]);
+    lagrangeMarkers[i].ring.lookAt(camera.position);
+    lagrangeMarkers[i].sphere.visible = showLagrange;
+    lagrangeMarkers[i].ring.visible = showLagrange;
+  }
+
+  // Field lines
+  computeFieldLines(simTime);
+
+  // Stars
+  starMat.uniforms.time.value = performance.now() * 0.001;
+
+  // HUD
+  if (frame % 8 === 0) updateHUD(simTime);
+
+  renderer.render(scene, camera);
+}
+
+// --- Resize ---
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// --- Start ---
+animate();
+</script>
+</body>
+</html>
