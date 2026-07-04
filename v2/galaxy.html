@@ -58,9 +58,9 @@
   .drag-hint { position:fixed; bottom:26px; right:34px; z-index:10; font-size:16px; letter-spacing:2px; color:var(--dim); pointer-events:none; }
 
   /* 敘事卡 */
-  .story { position:fixed; left:28px; top:112px; z-index:12;
-    width:min(440px, calc(100vw - 48px)); background:var(--panel); border:1.5px solid var(--line);
-    backdrop-filter:blur(16px); padding:24px 28px 20px; max-height:calc(100vh - 236px); overflow-y:auto; }
+  .story { position:fixed; left:28px; top:146px; z-index:12;
+    width:min(430px, calc(100vw - 48px)); background:var(--panel); border:1.5px solid var(--line);
+    backdrop-filter:blur(16px); padding:22px 26px 18px; max-height:calc(100vh - 268px); overflow-y:auto; }
   .story .eyebrow { font-family:'Cinzel',serif; font-size:14px; font-weight:700; letter-spacing:5px; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
   .story h3 { font-size:26px; color:var(--bright); letter-spacing:2px; font-weight:700; margin-bottom:10px; }
   .story .body { font-size:20px; line-height:1.75; color:var(--mid); }
@@ -120,8 +120,10 @@
     .story { left:8px; right:8px; top:auto; bottom:58px; width:auto; padding:16px 16px 14px; max-height:46vh; overflow-y:auto; }
     .story .body { font-size:16px; }
     .hud, .drag-hint, .fine { display:none; }
-    .title-block { left:16px; top:16px; }
+    .title-block { left:16px; top:14px; }
+    .t-main { font-size:12px; letter-spacing:4px; }
     .t-sub { font-size:17px; }
+    .t-credit { display:none; }
     .dex-toggle { right:16px; top:16px; }
     .dex { right:16px; top:64px; width:calc(100vw - 32px); }
   }
