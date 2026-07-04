@@ -200,6 +200,34 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
 .forcecard{border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:14px 16px;background:var(--bg-soft);font-size:.98rem;cursor:help;}
 .forcecard b{display:block;margin-bottom:4px;}
 .kb-note{border-left:3px solid var(--c-sand);background:var(--bg-soft);padding:12px 18px;border-radius:var(--radius-md);margin:12px 0;font-size:1rem;}
+
+/* 參照故事動畫卡 */
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:36px;}
+@media(max-width:860px){.story-grid{grid-template-columns:1fr;}}
+.story-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-xl);padding:30px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.story-card::after{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--c-coral));}
+.story-card .story-tag{font-family:'Caveat',cursive;font-size:1.3rem;color:var(--c-sand);display:block;}
+.story-card h3{font-size:1.45rem;margin:2px 0 14px;}
+.story-card p{color:var(--ink-soft);font-size:1rem;}
+.story-stage{position:relative;height:150px;background:var(--bg-soft);border:1px solid var(--line-soft);border-radius:var(--radius-md);margin:0 0 16px;overflow:hidden;}
+.sim-chip{position:absolute;top:34px;padding:7px 13px;border-radius:var(--radius-md);border:1.5px dashed var(--c-sky);color:var(--c-sky);background:#fff;font-size:.95rem;}
+.sim-chip.a{left:9%;animation:bmL .5s ease-in-out infinite alternate;}
+.sim-chip.b{right:9%;animation:bmR .5s ease-in-out infinite alternate;}
+@keyframes bmL{from{transform:translateX(0)}to{transform:translateX(30px)}}
+@keyframes bmR{from{transform:translateX(0)}to{transform:translateX(-30px)}}
+.story-stage.done .sim-chip{animation-play-state:paused;opacity:.3;}
+.sim-count{position:absolute;top:8px;width:100%;text-align:center;color:var(--ink-faint);font-size:.92rem;}
+.sim-result{position:absolute;bottom:46px;width:100%;text-align:center;font-weight:700;color:var(--c-mint);font-size:1.1rem;opacity:0;transition:.35s;}
+.sim-real{position:absolute;bottom:12px;width:100%;text-align:center;font-weight:700;color:var(--c-coral);font-size:1.02rem;opacity:0;transition:.35s;}
+.story-stage.done .sim-result,.story-stage.done .sim-real{opacity:1;}
+.mb-dot{position:absolute;border-radius:50%;background:#cdbfa5;}
+.mb-scan{position:absolute;top:0;bottom:0;width:3px;background:var(--c-sky);left:-6px;opacity:.65;}
+.mb-scan.run{animation:mbScan 2.4s linear forwards;}
+@keyframes mbScan{from{left:-4px}to{left:101%}}
+.mb-hidden{background:var(--c-sand);}
+.mb-hidden.found{background:var(--c-coral);box-shadow:0 0 0 7px rgba(232,90,79,.22);}
+.mb-label{position:absolute;padding:4px 12px;border-radius:var(--radius-pill);background:var(--c-coral);color:#fff;font-size:.9rem;font-weight:700;opacity:0;transition:.35s;}
+.mb-label.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -264,6 +292,27 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
       </div>
     </div>
     <div class="strip">數位商會把這三件事變成系統：<b>整理好的會員資料</b> × <b>會算的組合算法</b> × <b>越用越準的回饋迴圈</b>。</div>
+    <div class="story-grid">
+      <div class="story-card" style="--accent:var(--c-sky)">
+        <span class="story-tag">參照一 · 黑鏡〈Hang the DJ〉</span>
+        <h3>先模擬，再見面</h3>
+        <div class="story-stage" id="bm-stage">
+          <div class="sim-count" id="bm-count">模擬互動 第 1 次</div>
+          <div class="sim-chip a">數位分身 A</div>
+          <div class="sim-chip b">數位分身 B</div>
+          <div class="sim-result">998 / 1000 次走到一起 → 高匹配</div>
+          <div class="sim-real">🤝 這時才把兩個真人帶進場</div>
+        </div>
+        <p>劇中的交友系統讓兩個人的數位版本在模擬世界互動一千次，算出高匹配率，才把現實中的兩人推薦給彼此。數位商會借這個邏輯，把戀愛配對換成商務媒合：你的 Agent 和對方的 Agent 先互相理解、先跑過媒合，判斷真的高契合，再讓真人見面。</p>
+      </div>
+      <div class="story-card" style="--accent:var(--c-coral)">
+        <span class="story-tag">參照二 · 魔球 Moneyball</span>
+        <h3>用資料取代直覺</h3>
+        <div class="story-stage" id="mb-stage"></div>
+        <p>奧克蘭運動家隊用數據分析取代老球探的直覺去選球員，找出被低估、別人看走眼的人。傳統商會就像老派球探，靠人脈直覺和飯局眼緣媒合，容易漏掉不在你圈子、但其實跟你超合的人。數位商會用資料把這些人找出來。</p>
+      </div>
+    </div>
+    <div class="kb-note" style="margin-top:18px">黑鏡負責「先跑一輪再見面」的機制，魔球負責「用資料判斷」的精神。兩個合起來，就是數位商會在做的事。</div>
 <details class="fold">
       <summary>傳統商會的問題</summary>
       <div class="fold-body">
@@ -271,15 +320,7 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
         <p>更普遍的痛點：每次見一個新老闆都要從零自我介紹，三年跑下來也許只認識五十個人，對方多半記不住你。問題的本質是：<b>你必須親自見很多不對的人，才找得到對的人。</b>這個成本高到大家寧可用很沒效率的方式湊合著用。</p>
       </div>
     </details>
-<details class="fold">
-      <summary>兩個參照故事：黑鏡與魔球</summary>
-      <div class="fold-body">
-        <h4>黑鏡〈Hang the DJ〉：先模擬，再見面</h4>
-        <p>劇中的交友系統讓兩個人的數位版本在模擬世界互動一千次，算出高匹配率才把現實中的兩人推薦給彼此。數位商會借這個邏輯，把戀愛配對換成商務媒合：你的 Agent 和對方的 Agent 先互相理解、先跑過媒合，判斷真的高契合，再把兩個真人帶進場。</p>
-        <h4>魔球 Moneyball：用資料取代直覺</h4>
-        <p>奧克蘭運動家隊用數據分析取代老球探的直覺去選球員，找出被低估、別人看走眼的人。傳統商會就像老派球探，靠人脈直覺和飯局眼緣媒合，容易漏掉不在你圈子、但其實跟你超合的人。黑鏡負責「先跑一輪再見面」的機制，魔球負責「用資料判斷」的精神。</p>
-      </div>
-    </details>
+
   </div>
 </section>
 
@@ -289,7 +330,7 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
     <div class="eyebrow">架構一眼看懂</div>
     <h2 class="section-title">真人、Agent、平台，各管各的事</h2>
     <div class="netbox" style="max-width:860px;margin:0 auto;">
-      <svg viewBox="0 0 760 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="數位商會平台三角結構圖">
+      <svg viewBox="0 -16 760 476" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="數位商會平台三角結構圖">
       <defs>
         <style>
           .plat{fill:#FBF7EF;stroke:#ead8a8;stroke-width:1.5;stroke-dasharray:7 6;}
@@ -315,8 +356,8 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
       <line class="link" x1="380" y1="150" x2="580" y2="360"/>
       <line class="link" x1="180" y1="360" x2="580" y2="360"/>
 
-      <text class="center" x="380" y="252" font-size="26">Agent ↔ Agent</text>
-      <text class="center" x="380" y="286" font-size="22">商務連結</text>
+      <text class="center" x="380" y="274" font-size="23">Agent ↔ Agent</text>
+      <text class="center" x="380" y="306" font-size="20">商務連結</text>
 
       <g>
         <line class="link" x1="380" y1="60" x2="380" y2="108"/>
@@ -959,6 +1000,34 @@ document.addEventListener("mousemove",e=>{
     tt.style.top=(e.clientY+18)+"px";
   } else tt.style.opacity=0;
 });
+
+
+// 參照故事動畫：黑鏡（模擬計數）與魔球（掃描點亮）
+(function(){
+  const stage=document.getElementById("bm-stage"),cnt=document.getElementById("bm-count");
+  if(stage){let n=0,timer;
+    function cycle(){stage.classList.remove("done");n=0;
+      timer=setInterval(()=>{n+=37;
+        if(n>=1000){n=1000;clearInterval(timer);stage.classList.add("done");setTimeout(cycle,3400);}
+        cnt.textContent="模擬互動 第 "+n+" 次";},60);}
+    cycle();}
+  const mb=document.getElementById("mb-stage");
+  if(mb){
+    const dots=[[8,22,16],[20,64,22],[34,30,18],[46,70,14],[58,26,20],[72,62,18],[86,34,16],[15,86,12],[63,88,12],[80,80,14]];
+    dots.forEach((d,i)=>{const el=document.createElement("div");
+      el.className="mb-dot"+(i===8?" mb-hidden":"");
+      el.style.left=d[0]+"%";el.style.top=d[1]+"px";el.style.width=d[2]+"px";el.style.height=d[2]+"px";
+      mb.appendChild(el);});
+    const scan=document.createElement("div");scan.className="mb-scan";mb.appendChild(scan);
+    const label=document.createElement("div");label.className="mb-label";label.textContent="被低估的高契合 ✓";
+    label.style.left="42%";label.style.bottom="12px";mb.appendChild(label);
+    const hidden=mb.querySelector(".mb-hidden");
+    function cycle(){scan.classList.remove("run");hidden.classList.remove("found");label.classList.remove("show");
+      void scan.offsetWidth;scan.classList.add("run");
+      setTimeout(()=>{hidden.classList.add("found");label.classList.add("show");},1450);
+      setTimeout(cycle,5400);}
+    cycle();}
+})();
 
 // flow tabs（點選切換，不自動輪播）
 const tabs=[...document.querySelectorAll(".flow-tab")],panels=[...document.querySelectorAll(".flow-panel")];
