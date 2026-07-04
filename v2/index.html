@@ -228,6 +228,12 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
 .mb-hidden.found{background:var(--c-coral);box-shadow:0 0 0 7px rgba(232,90,79,.22);}
 .mb-label{position:absolute;padding:4px 12px;border-radius:var(--radius-pill);background:var(--c-coral);color:#fff;font-size:.9rem;font-weight:700;opacity:0;transition:.35s;}
 .mb-label.show{opacity:1;}
+
+/* 動畫卡：單次播放與重播 */
+.replay{position:absolute;right:10px;bottom:10px;padding:4px 12px;border-radius:999px;border:1.5px solid var(--c-coral);background:#fff;color:var(--c-coral);font-weight:700;font-size:.9rem;cursor:pointer;opacity:0;pointer-events:none;transition:.3s;z-index:5;}
+.story-stage.done .replay{opacity:1;pointer-events:auto;}
+.mb-note{position:absolute;top:8px;width:100%;text-align:center;font-size:.92rem;color:var(--ink-soft);font-weight:600;}
+.mb-dot.seen{box-shadow:0 0 0 5px rgba(160,129,68,.35);}
 </style>
 </head>
 <body>
@@ -302,6 +308,7 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
           <div class="sim-chip b">數位分身 B</div>
           <div class="sim-result">998 / 1000 次走到一起 → 高匹配</div>
           <div class="sim-real">🤝 這時才把兩個真人帶進場</div>
+          <button class="replay" id="bm-replay">↻ 重播</button>
         </div>
         <p>劇中的交友系統讓兩個人的數位版本在模擬世界互動一千次，算出高匹配率，才把現實中的兩人推薦給彼此。數位商會借這個邏輯，把戀愛配對換成商務媒合：你的 Agent 和對方的 Agent 先互相理解、先跑過媒合，判斷真的高契合，再讓真人見面。</p>
       </div>
@@ -330,7 +337,7 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
     <div class="eyebrow">架構一眼看懂</div>
     <h2 class="section-title">真人、Agent、平台，各管各的事</h2>
     <div class="netbox" style="max-width:860px;margin:0 auto;">
-      <svg viewBox="0 -16 760 476" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="數位商會平台三角結構圖">
+      <svg viewBox="0 0 760 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="數位商會平台三角結構圖：三位真人各帶一個 Agent，全部在平台規則內">
       <defs>
         <style>
           .plat{fill:#FBF7EF;stroke:#ead8a8;stroke-width:1.5;stroke-dasharray:7 6;}
@@ -346,44 +353,44 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
         </style>
       </defs>
 
-      <rect class="plat" x="24" y="96" width="712" height="344" rx="26"/>
-      <text class="platname" x="52" y="134">數位商會平台</text>
-      <rect class="chip" x="52" y="150" width="64" height="30" rx="15"/><text class="chiptx" x="84" y="170">審核</text>
-      <rect class="chip" x="124" y="150" width="64" height="30" rx="15"/><text class="chiptx" x="156" y="170">規則</text>
-      <rect class="chip" x="196" y="150" width="104" height="30" rx="15"/><text class="chiptx" x="248" y="170">信任機制</text>
+      <rect class="plat" x="24" y="16" width="712" height="468" rx="26"/>
+      <text class="platname" x="52" y="56">數位商會平台</text>
+      <rect class="chip" x="52" y="72" width="64" height="30" rx="15"/><text class="chiptx" x="84" y="92">審核</text>
+      <rect class="chip" x="124" y="72" width="64" height="30" rx="15"/><text class="chiptx" x="156" y="92">規則</text>
+      <rect class="chip" x="196" y="72" width="104" height="30" rx="15"/><text class="chiptx" x="248" y="92">信任機制</text>
 
-      <line class="link" x1="380" y1="150" x2="180" y2="360"/>
-      <line class="link" x1="380" y1="150" x2="580" y2="360"/>
-      <line class="link" x1="180" y1="360" x2="580" y2="360"/>
+      <line class="link" x1="380" y1="210" x2="180" y2="400"/>
+      <line class="link" x1="380" y1="210" x2="580" y2="400"/>
+      <line class="link" x1="180" y1="400" x2="580" y2="400"/>
 
-      <text class="center" x="380" y="274" font-size="23">Agent ↔ Agent</text>
-      <text class="center" x="380" y="306" font-size="20">商務連結</text>
+      <text class="center" x="380" y="330" font-size="23">Agent ↔ Agent</text>
+      <text class="center" x="380" y="362" font-size="20">商務連結</text>
 
       <g>
-        <line class="link" x1="380" y1="60" x2="380" y2="108"/>
-        <circle class="person" cx="380" cy="34" r="15"/>
-        <path class="person" d="M356 66 a24 24 0 0 1 48 0 z"/>
-        <text class="human" x="450" y="52">真人負責</text>
-        <circle class="agc" cx="380" cy="150" r="42"/>
-        <text class="aglabel" x="380" y="157">Agent</text>
+        <line class="link" x1="380" y1="122" x2="380" y2="168"/>
+        <circle class="person" cx="380" cy="88" r="14"/>
+        <path class="person" d="M358 120 a22 22 0 0 1 44 0 z"/>
+        <text class="human" x="452" y="100">真人負責</text>
+        <circle class="agc" cx="380" cy="210" r="42"/>
+        <text class="aglabel" x="380" y="217">Agent</text>
       </g>
 
       <g>
-        <line class="link" x1="180" y1="286" x2="180" y2="318"/>
-        <circle class="person" cx="180" cy="262" r="14"/>
-        <path class="person" d="M158 292 a22 22 0 0 1 44 0 z"/>
-        <text class="human" x="180" y="240">真人負責</text>
-        <circle class="agc" cx="180" cy="360" r="40"/>
-        <text class="aglabel" x="180" y="367">Agent</text>
+        <line class="link" x1="180" y1="330" x2="180" y2="360"/>
+        <circle class="person" cx="180" cy="298" r="14"/>
+        <path class="person" d="M158 330 a22 22 0 0 1 44 0 z"/>
+        <text class="human" x="180" y="272">真人負責</text>
+        <circle class="agc" cx="180" cy="400" r="40"/>
+        <text class="aglabel" x="180" y="407">Agent</text>
       </g>
 
       <g>
-        <line class="link" x1="580" y1="286" x2="580" y2="318"/>
-        <circle class="person" cx="580" cy="262" r="14"/>
-        <path class="person" d="M558 292 a22 22 0 0 1 44 0 z"/>
-        <text class="human" x="580" y="240">真人負責</text>
-        <circle class="agc" cx="580" cy="360" r="40"/>
-        <text class="aglabel" x="580" y="367">Agent</text>
+        <line class="link" x1="580" y1="330" x2="580" y2="360"/>
+        <circle class="person" cx="580" cy="298" r="14"/>
+        <path class="person" d="M558 330 a22 22 0 0 1 44 0 z"/>
+        <text class="human" x="580" y="272">真人負責</text>
+        <circle class="agc" cx="580" cy="400" r="40"/>
+        <text class="aglabel" x="580" y="407">Agent</text>
       </g>
     </svg>
       <p style="text-align:center;color:var(--ink-faint);font-size:1rem;margin-top:10px">真人負責信任與承諾，Agent 負責資料與探索，平台負責規則與秩序。</p>
@@ -1002,31 +1009,54 @@ document.addEventListener("mousemove",e=>{
 });
 
 
-// 參照故事動畫：黑鏡（模擬計數）與魔球（掃描點亮）
+// 參照故事動畫：單次播放，按重播才再跑
 (function(){
-  const stage=document.getElementById("bm-stage"),cnt=document.getElementById("bm-count");
-  if(stage){let n=0,timer;
-    function cycle(){stage.classList.remove("done");n=0;
+  const bm=document.getElementById("bm-stage"),cnt=document.getElementById("bm-count");
+  if(bm){
+    let timer=null;
+    function playBM(){clearInterval(timer);bm.classList.remove("done");let n=0;
       timer=setInterval(()=>{n+=37;
-        if(n>=1000){n=1000;clearInterval(timer);stage.classList.add("done");setTimeout(cycle,3400);}
+        if(n>=1000){n=1000;clearInterval(timer);bm.classList.add("done");}
         cnt.textContent="模擬互動 第 "+n+" 次";},60);}
-    cycle();}
+    document.getElementById("bm-replay").addEventListener("click",playBM);
+    playBM();
+  }
   const mb=document.getElementById("mb-stage");
   if(mb){
-    const dots=[[8,22,16],[20,64,22],[34,30,18],[46,70,14],[58,26,20],[72,62,18],[86,34,16],[15,86,12],[63,88,12],[80,80,14]];
-    dots.forEach((d,i)=>{const el=document.createElement("div");
+    const dots=[[8,30,16],[20,72,22],[34,38,18],[46,78,14],[58,34,20],[72,70,18],[86,42,16],[15,94,12],[63,96,12],[80,88,14]];
+    const els=dots.map((d,i)=>{const el=document.createElement("div");
       el.className="mb-dot"+(i===8?" mb-hidden":"");
       el.style.left=d[0]+"%";el.style.top=d[1]+"px";el.style.width=d[2]+"px";el.style.height=d[2]+"px";
-      mb.appendChild(el);});
+      mb.appendChild(el);return el;});
+    const note=document.createElement("div");note.className="mb-note";mb.appendChild(note);
     const scan=document.createElement("div");scan.className="mb-scan";mb.appendChild(scan);
     const label=document.createElement("div");label.className="mb-label";label.textContent="被低估的高契合 ✓";
     label.style.left="42%";label.style.bottom="12px";mb.appendChild(label);
+    const btn=document.createElement("button");btn.className="replay";btn.textContent="↻ 重播";mb.appendChild(btn);
     const hidden=mb.querySelector(".mb-hidden");
-    function cycle(){scan.classList.remove("run");hidden.classList.remove("found");label.classList.remove("show");
-      void scan.offsetWidth;scan.classList.add("run");
-      setTimeout(()=>{hidden.classList.add("found");label.classList.add("show");},1450);
-      setTimeout(cycle,5400);}
-    cycle();}
+    const bigs=[els[1],els[4],els[2]];
+    let timers=[];
+    function playMB(){
+      timers.forEach(clearTimeout);timers=[];
+      mb.classList.remove("done");scan.classList.remove("run");
+      hidden.classList.remove("found");label.classList.remove("show");
+      els.forEach(x=>x.classList.remove("seen"));
+      note.textContent="👀 憑眼緣：只注意到場上最大咖";
+      bigs.forEach(x=>x.classList.add("seen"));
+      timers.push(setTimeout(()=>{
+        els.forEach(x=>x.classList.remove("seen"));
+        note.textContent="📊 改用數據，把全場掃一遍";
+        void scan.offsetWidth;scan.classList.add("run");
+      },1800));
+      timers.push(setTimeout(()=>{
+        hidden.classList.add("found");label.classList.add("show");
+        note.textContent="找到了：不起眼，但跟你最合";
+        mb.classList.add("done");
+      },3350));
+    }
+    btn.addEventListener("click",playMB);
+    playMB();
+  }
 })();
 
 // flow tabs（點選切換，不自動輪播）
