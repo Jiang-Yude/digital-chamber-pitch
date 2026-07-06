@@ -245,7 +245,7 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
       <li><a href="#why">為什麼</a></li>
       <li><a href="#structure">架構</a></li>
       <li><a href="#demo">現場模擬</a></li>
-      <li><a href="#knowledge">理論與評估</a></li>
+      <li><a href="#nets">評估方法</a></li>
       <li><a href="#flow">怎麼運作</a></li>
       <li><a href="#trust">信任</a></li>
       <li><a href="#advisors">AI 顧問</a></li>
@@ -463,32 +463,11 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
 </section>
 
 
-<section id="knowledge">
+<section id="roadmap">
   <div class="container">
-    <div class="eyebrow">理論層</div>
-    <h2 class="section-title">這套算法背後：人際場力學</h2>
-    <p class="section-sub">理論架構：<b>吳星瑩</b>。江昱德把它做成 AI 應用，發展成「人際場力學向量分析」，就是上面現場模擬跑的東西。滑鼠移到粗體詞上有詳細說明。</p>
-    <p style="color:var(--ink-soft);max-width:860px">理論的核心：人在場中處於一種會滑動的「施力狀態」（力態），同一個人在不同的場會滑成不同力態，所以要看的是「人放進場之後」的樣子，以及人與人交互作用後整個場的健康。</p>
-    <div class="forcegrid">
-      <div class="forcecard" data-tip="設定方向、匯聚眾人力量的中心（星系比喻：中心恆星）。健康時給方向、扛決策；過度時變成一言堂，聽不到異議。"><b style="color:var(--c-coral)">主導</b>給方向、扛決策的中心。過度時聽不到異議。</div>
-      <div class="forcecard" data-tip="自己承擔自身重量與責任，各循軌道自行運轉；健康場的骨幹，敢對主導者說真話。過度時單打獨鬥、難以協作。"><b style="color:var(--c-sky)">獨立</b>自己承重、敢說真話的骨幹。過度時單打獨鬥。</div>
-      <div class="forcecard" data-tip="感知張力、微調平衡的人，在乎責任是否對齊、承重是否平衡；必要時介入、穩定後退場（星系比喻：拉格朗日點）。過度時變成代償節點，燃燒自己撐全場。"><b style="color:var(--c-mint)">穩場</b>感知張力、微調平衡。過度時燃燒自己撐全場。</div>
-      <div class="forcecard" data-tip="靠角色、頭銜、規矩與敘事立足，幫場建立秩序感。過度時開始過濾異議，只留下擁護的聲音。"><b style="color:var(--c-sand)">角框</b>靠角色與規矩建立秩序。過度時過濾掉異議。</div>
-      <div class="forcecard" data-tip="把重量掛在別人身上，以情緒認同換取位置。健康時是溫暖的支持者；過多時形成代償壓力，最先壓垮穩場者。"><b style="color:var(--c-lavender)">依附</b>以情緒認同換位置的支持者。過多時壓垮穩場者。</div>
-      <div class="forcecard" data-tip="在場之間游移、選擇，帶進新資訊與活力。不落地時只放大願景、不承擔重量。"><b style="color:var(--c-peach)">游擇</b>游移帶來新資訊與活力。不落地時只放願景。</div>
-      <div class="forcecard" data-tip="會出手戳場的人。健康時是異議與校準的重要來源；過度時為反對而反對，製造衝突。"><b style="color:var(--c-rose)">挑釁</b>戳場的人，健康時是校準來源。過度時只剩衝突。</div>
-    </div>
-    <p style="color:var(--ink-soft);max-width:860px">理論還定義了場的四種狀態：<span class="term" data-tip="健康基準：主導者給方向、獨立者各自承重、穩場者微調平衡，系統動態平衡。">星系平衡</span>、<span class="term" data-tip="初期偏移：獨立者比例下降，部分成員需要過多照顧，壓力開始集中到少數節點。">微擾場</span>、<span class="term" data-tip="中度失衡：重量壓在少數代償節點（通常是穩場者或獨立者）身上，表面有秩序，實際靠燃燒清醒者維持；此時推銷滲透型行為開始試探。">代償場</span>、<span class="term" data-tip="病態回路：場內只剩主導者與擁護的聲音，異議被過濾，主導者失去校準能力。">閉鎖場</span>。現場模擬的「場體檢」五個燈號，就是把這四種狀態變成量得出來的指標。想看理論的樣子，可以開 <a href="galaxy.html" target="_blank" style="color:var(--c-coral);font-weight:700;">星系平衡模型 3D 模擬</a>，按「擾動」看穩場者怎麼介入再退場。</p>
-    <details class="fold">
-      <summary>怎麼算的：四層運算架構 <span class="sumtag">向量卡 → 配對 → 場體檢 → 校準</span></summary>
-      <div class="fold-body">
-        <p><b>L1 場力向量卡</b>：每位會員一張、綁定場景（同一人在商會場與創業場是兩張卡）。內容包含七力態光譜（光明面與陰影面分開計）、動機與動向、動能，加三個原因力：重力（承諾兌現的自我承重）、引力（別人多想靠近）、慣性（模式黏著度）。資料分自評、互評、行為紀錄三軌，各帶可信度權重，行為紀錄權重最高、過期自動降權。</p>
-        <p><b>L2 組合運算</b>：兩張向量卡相碰，四項分開給分、可稽核：力態互補（理論先驗的互補矩陣）、供需對接（能提供什麼對正在找什麼，雙向各算一次）、節奏匹配（動能差距）、風險（滲透風險與承重風險）。輸出四分類：優先聊、值得短聊、刺激型、不建議。</p>
-        <p><b>L3 場體檢</b>：整個商會的結構健康儀表板，五個燈號對應理論的四種場狀態，回答主辦方「這個場現在缺什麼樣的人」。</p>
-        <p><b>L4 回饋校準</b>：見面結果回流。起步階段只記失誤帳本、不自動調參；同型組合跨多場活動重複失準才修模型，並與隨機配對、人工配對做基準比較，贏不過就不宣稱有效。</p>
-        <div class="kb-note">誠實邊界：初始參數來自理論先驗，早期輸出只做排序與探索建議，附資料成熟度標註，不給精準勝率。</div>
-      </div>
-    </details>
+    <div class="eyebrow">進行中</div>
+    <h2 class="section-title">後續還有一套「場的分析」算法</h2>
+    <p class="section-sub">除了現在跑的配對算法，我們還在開發一套針對整個場的分析算法，會在資料量累積到足夠、能穩定運算之後才推出。</p>
   </div>
 </section>
 
