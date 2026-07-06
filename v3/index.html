@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>數位商會 V2：互動演示與完整提案</title>
+<title>數位商會 V3：完整提案</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Caveat:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -244,7 +244,6 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
     <ul class="nav-links">
       <li><a href="#why">為什麼</a></li>
       <li><a href="#structure">架構</a></li>
-      <li><a href="#demo">現場模擬</a></li>
       <li><a href="#nets">評估方法</a></li>
       <li><a href="#flow">怎麼運作</a></li>
       <li><a href="#trust">信任</a></li>
@@ -259,20 +258,20 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
   <div class="watercolor wc-peach"></div>
   <div class="watercolor wc-sand"></div>
   <div class="container">
-    <div class="eyebrow">江江教練 · 數位商會 V2 · 演示與提案整合版</div>
+    <div class="eyebrow">江江教練 · 數位商會 V3 · 完整提案</div>
     <h1>每個人帶著自己的<br><span class="italic">AI 商務代理</span> 進場的商會</h1>
     <p class="lead"><strong>真人</strong>負責信任與承諾，<strong>Agent</strong> 負責資料與探索，<strong>平台</strong>負責規則與秩序。</p>
     <div class="pills">
-      <span class="pill"><b>人際場力學</b> 組合算法</span>
+      <span class="pill"><b>組合媒合</b> 算法</span>
       <span class="pill"><b>AI 顧問團</b> 納瓦爾 × 馬斯克</span>
       <span class="pill"><b>真實回饋</b> 越用越準</span>
     </div>
     <div class="btn-row">
-      <a class="button" href="#demo">看 20 人現場模擬</a>
-      <a class="button ghost" href="#flow">先看怎麼運作</a>
+      <a class="button" href="#flow">看怎麼運作</a>
+      <a class="button ghost" href="#mvp">MVP 怎麼起跑</a>
     </div>
-    <p class="fineprint">頁內 20 位會員與其資料均為虛構模擬，配對算法為真實可運算版本，在你的瀏覽器裡即時計算。</p>
-    <p class="credit-line">理論架構：<b>吳星瑩</b>（人際場力學） · AI 應用與向量分析：<b>江昱德</b> · NETS 評估法提供：<b>陳明勇</b></p>
+    <p class="fineprint">頁內人物與案例均為虛構示意。</p>
+    <p class="credit-line">AI 應用與向量分析：<b>江昱德</b> · NETS 評估法提供：<b>陳明勇</b></p>
   </div>
 </section>
 
@@ -430,44 +429,21 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
         <ul>
           <li><b>身份與責任層</b>：每位會員綁定真實身份，每個 Agent 只綁一個負責人；沒有真人負責的 Agent 只能讀公開資料，不能發媒合邀請。</li>
           <li><b>會員資料層</b>：資料分五組（我是誰、最近在做什麼、能提供什麼、正在找什麼、偏好的合作方式），每筆標可見度、更新日期、來源、可信度，過期自動降權。</li>
-          <li><b>協議與互通層</b>：共同格式，包含會員資料、Agent 能力名片、媒合請求；場力向量卡也走這層交換。</li>
+          <li><b>協議與互通層</b>：共同格式，包含會員資料、Agent 能力名片、媒合請求；會員向量卡也走這層交換。</li>
           <li><b>授權與政策層</b>：授權是一張有欄位、有目的、有期限的通行證，可只開放某幾欄、只給某個人、只給某段時間、限查詢次數、禁止匯出。</li>
-          <li><b>媒合與推薦層</b>：Agent 產出候選人與推薦理由，但不替真人做承諾；每個推薦附為什麼、依據、風險、開場建議。上面 demo 跑的就是這一層的算法。</li>
-          <li><b>治理與秩序層</b>：入會審核、濫用偵測、信任評分、申訴處理；場體檢儀表板也掛這層。</li>
+          <li><b>媒合與推薦層</b>：Agent 產出候選人與推薦理由，但不替真人做承諾；每個推薦附為什麼、依據、風險、開場建議。</li>
+          <li><b>治理與秩序層</b>：入會審核、濫用偵測、信任評分、申訴處理。</li>
         </ul>
       </div>
     </details>
   </div>
 </section>
 
-<section id="demo">
-  <div class="container">
-    <div class="eyebrow">現場模擬</div>
-    <h2 class="section-title">20 位會員、190 組配對，算法就地跑給你看</h2>
-    <p class="section-sub">下方 20 位會員為虛構角色。點任何一個節點，看系統怎麼替他找人、怎麼替他擋雷。連線是全場分數最高的配對。</p>
-    <div class="statchips" id="chips"></div>
-    <div class="demo-grid">
-      <div class="netbox">
-        <canvas id="net" width="640" height="560"></canvas>
-        <div class="legend" id="legend"></div>
-      </div>
-      <div class="panel" id="detail">
-        <h3>點左邊任一個節點</h3>
-        <p class="role">看這位會員的推薦報告</p>
-        <p class="hint">系統給的每個分數都拆成四項理由：力態互補、供需對接、節奏匹配、風險。可稽核，可以被質疑，也可以被修正。</p>
-      </div>
-    </div>
-    <div class="health" id="health"></div>
-    <div class="healthnote" id="healthnote"></div>
-  </div>
-</section>
-
-
 <section id="roadmap">
   <div class="container">
     <div class="eyebrow">進行中</div>
     <h2 class="section-title">後續還有一套「場的分析」算法</h2>
-    <p class="section-sub">除了現在跑的配對算法，我們還在開發一套針對整個場的分析算法，會在資料量累積到足夠、能穩定運算之後才推出。</p>
+    <p class="section-sub">除了配對算法，我們還在開發一套針對整個場的分析算法，會在資料量累積到足夠、能穩定運算之後才推出。</p>
   </div>
 </section>
 
@@ -536,7 +512,7 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
         <p>強度看這一型行為的能量總量，頻率看這一型多常是你的第一反應。一個人可能某型能量很高，但那型從來不是他的第一反應，兩層分開才看得出來。</p>
       </div>
     </div>
-    <div class="kb-note" style="margin-top:22px;max-width:900px;margin-left:auto;margin-right:auto;">兩套的分工：<b>NETS 看個人行為風格與團體常模</b>（你是什麼風格、跟團體平均差在哪）；<b>人際場力學向量分析看組合交互</b>（你們放在一起會怎樣、這個場健不健康）。可以並用：NETS 分數可作向量卡的輸入來源之一，媒合結果也能回頭跟 NETS 分型交叉驗證。</div>
+    <div class="kb-note" style="margin-top:22px;max-width:900px;margin-left:auto;margin-right:auto;">兩套的分工：<b>NETS 看個人行為風格與團體常模</b>（你是什麼風格、跟團體平均差在哪）；<b>組合媒合算法看組合交互</b>（你們放在一起會怎樣、這個場合不合）。可以並用：NETS 分數可作媒合算法的輸入來源之一，媒合結果也能回頭跟 NETS 分型交叉驗證。</div>
     <div style="text-align:left;max-width:900px;margin:20px auto 0">
     <details class="fold">
       <summary>五型怎麼判、各是什麼樣 <span class="sumtag">文森 2026-07-04 補充</span></summary>
@@ -578,11 +554,11 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
             <ul>
               <li>幫你搭個人知識庫，資料自己保管、自己更新</li>
               <li>真人認證入會，每半年復查一次，確保卡片後面是活生生的人</li>
-              <li>你的 AI 商務代理整理出一張「場力向量卡」：你是誰、最近在做什麼、能提供什麼、正在找什麼、你在場中的施力狀態</li>
+              <li>你的 AI 商務代理整理出一張「向量卡」：你是誰、最近在做什麼、能提供什麼、正在找什麼、偏好怎麼合作</li>
             </ul>
           </div>
           <div class="vis">
-            <div class="vcard pulse"><div class="avatar" style="background:var(--c-sky)">你</div>場力向量卡<br><span style="color:var(--ink-faint);font-size:.95rem">✓ 真人認證</span></div>
+            <div class="vcard pulse"><div class="avatar" style="background:var(--c-sky)">你</div>向量卡<br><span style="color:var(--ink-faint);font-size:.95rem">✓ 真人認證</span></div>
           </div>
         </div>
         <div class="flow-panel">
@@ -765,12 +741,12 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
           <li><b>你的代表內容</b>：3 到 5 篇文章或連結</li>
           <li><b>你現在的問題、需求，或想提供的方案</b></li>
         </ul>
-        <p>願意開放的人，可以自選要分享哪些資料、開放幾篇。想跑完整版的場力向量分析，再加一份 12 到 16 題的精簡行為量表。沒效也沒損失，有效就有數據可以往下談。</p>
+        <p>願意開放的人，可以自選要分享哪些資料、開放幾篇。想跑完整版的向量分析，再加一份 12 到 16 題的精簡行為量表。沒效也沒損失，有效就有數據可以往下談。</p>
       </div>
     </details>
     </div>
     <div class="btn-row" style="margin-top:30px">
-      <a class="button" href="#demo">再看一次模擬</a>
+      <a class="button" href="#flow">再看一次流程</a>
     </div>
     <div style="text-align:left;margin-top:30px"><details class="fold">
       <summary>MVP：第一版做什麼、先不做什麼</summary>
@@ -809,7 +785,7 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
       <div class="fold-body">
         <ul>
           <li><b>資料會過期</b>：商務媒合高度依賴「最近在做什麼、現在缺什麼」，資料一過期，媒合就把不存在的需求當成機會，真人撲空比沒有推薦更傷。去中心化的即時更新設計正是為了對付這一點。</li>
-          <li><b>平台可能被推銷型會員佔據</b>：只要 Agent 能讀資料、找人、送邀請，就會吸引想大量開發客戶的人。治理太弱，認真合作的會員會被噪音淹沒然後離開。治理和信任機制是命脈。上面 demo 的「系統擋雷」示範的就是這件事。</li>
+          <li><b>平台可能被推銷型會員佔據</b>：只要 Agent 能讀資料、找人、送邀請，就會吸引想大量開發客戶的人。治理太弱，認真合作的會員會被噪音淹沒然後離開。治理和信任機制是命脈，媒合報告會主動幫雙方擋掉高風險的組合。</li>
           <li><b>Agent 互通表面是技術問題，實際是責任問題</b>：不同 Agent 判斷不會完全一致，有的會把主人的偏好講得像承諾。邊界從一開始就劃死：Agent 只能建議，真人才能承諾。</li>
         </ul>
       </div>
@@ -822,187 +798,17 @@ details.fold .fold-body h4{margin:14px 0 6px;font-size:1.08rem;}
         <p>底層是同一套：真人負責判斷與承諾，Agent 負責勞動與探索，平台負責規則與秩序。商會換成教學，會員換成師生，Agent 換成助教和學伴。</p>
       </div>
     </details></div>
-    <div class="honest">誠實聲明：配對算法的初始參數來自「人際場力學」理論模型，屬於模型基底，尚未宣稱經科學驗證。早期輸出只做排序與探索建議，附資料成熟度標註，不給精準勝率；它的準確度靠真實回饋持續校準累積，並與隨機配對、人工配對做基準比較。我們把每一筆預測失誤記在帳上，這本帳就是系統進步的證據。</div>
+    <div class="honest">誠實聲明：配對算法的初始參數來自既有的行為理論模型，屬於模型基底，尚未宣稱經科學驗證。早期輸出只做排序與探索建議，附資料成熟度標註，不給精準勝率；它的準確度靠真實回饋持續校準累積，並與隨機配對、人工配對做基準比較。我們把每一筆預測失誤記在帳上，這本帳就是系統進步的證據。</div>
   </div>
 </section>
 
 <footer>
   <div class="container">
-    <span class="hand">數位商會 V2</span> · 理論架構 吳星瑩（人際場力學） · AI 應用與向量分析 江昱德 · NETS 評估法 陳明勇 · 頁內人物皆為虛構模擬 · 本頁未公開索引
+    <span class="hand">數位商會 V3</span> · AI 應用與向量分析 江昱德 · NETS 評估法 陳明勇 · 頁內人物皆為虛構模擬 · 本頁未公開索引
   </div>
 </footer>
 
 <script>
-const MEMBERS = [
-{id:"M01",name:"陳建宏",title:"精密零件廠二代",seeking:"想找懂數位轉型的人幫忙把老爸的工廠系統化",offering:"工廠產能有餘裕，可以接代工訂單",seeks_tags:["數位轉型","AI導入","人才招募"],offers_tags:["製造代工","供應鏈"],light:{"主導":0.30,"獨立":0.35,"穩場":0.45,"角框":0.55,"依附":0.25,"游擇":0.20,"挑釁":0.15},shadow:{"主導":0.20,"獨立":0.15,"穩場":0.15,"角框":0.35,"依附":0.20,"游擇":0.15,"挑釁":0.10,"操控":0.05},gravity:0.55,attraction:0.50,inertia:0.60,energy:0.55,awareness:0.50},
-{id:"M02",name:"林雅慧",title:"會計師事務所主持會計師",seeking:"想拓展中小企業客戶的財稅規劃業務",offering:"熟悉財稅法規，能幫忙看合約跟節稅結構",seeks_tags:["行銷曝光","人才招募"],offers_tags:["財稅規劃","法務合規"],light:{"主導":0.35,"獨立":0.40,"穩場":0.70,"角框":0.30,"依附":0.20,"游擇":0.15,"挑釁":0.10},shadow:{"主導":0.15,"獨立":0.15,"穩場":0.10,"角框":0.25,"依附":0.15,"游擇":0.10,"挑釁":0.05,"操控":0.05},gravity:0.65,attraction:0.60,inertia:0.40,energy:0.60,awareness:0.75},
-{id:"M03",name:"王志豪",title:"電商品牌創辦人",seeking:"急需資金融資撐過下一波庫存週轉",offering:"有一批穩定的電商流量與通路資源可以互惠導流",seeks_tags:["資金融資","供應鏈"],offers_tags:["電商通路","行銷曝光"],light:{"主導":0.50,"獨立":0.60,"穩場":0.25,"角框":0.20,"依附":0.15,"游擇":0.35,"挑釁":0.30},shadow:{"主導":0.30,"獨立":0.25,"穩場":0.10,"角框":0.15,"依附":0.20,"游擇":0.30,"挑釁":0.25,"操控":0.15},gravity:0.50,attraction:0.55,inertia:0.30,energy:0.75,awareness:0.45},
-{id:"M04",name:"張美玲",title:"永續顧問",seeking:"想認識有出口貿易需求的傳產老闆做永續報告書案源",offering:"能協助企業寫永續報告書、對接國際標準",seeks_tags:["出口貿易","製造代工"],offers_tags:["永續報告","法務合規"],light:{"主導":0.25,"獨立":0.30,"穩場":0.55,"角框":0.60,"依附":0.30,"游擇":0.15,"挑釁":0.10},shadow:{"主導":0.10,"獨立":0.10,"穩場":0.15,"角框":0.30,"依附":0.25,"游擇":0.10,"挑釁":0.05,"操控":0.05},gravity:0.60,attraction:0.45,inertia:0.55,energy:0.50,awareness:0.70},
-{id:"M05",name:"李國強",title:"扶輪社資深社友、機械工具商",seeking:"想找年輕人才接班，因為公司找不到人",offering:"三十年產業人脈與供應鏈通路可以介紹給後輩",seeks_tags:["人才招募","數位轉型"],offers_tags:["供應鏈","出口貿易"],light:{"主導":0.45,"獨立":0.30,"穩場":0.75,"角框":0.40,"依附":0.20,"游擇":0.10,"挑釁":0.15},shadow:{"主導":0.20,"獨立":0.10,"穩場":0.15,"角框":0.30,"依附":0.15,"游擇":0.10,"挑釁":0.10,"操控":0.05},gravity:0.70,attraction:0.55,inertia:0.65,energy:0.45,awareness:0.65},
-{id:"M06",name:"黃思婷",title:"獨立品牌設計師",seeking:"想找餐飲連鎖業者合作品牌重塑案",offering:"能做品牌識別設計、店面視覺跟包裝設計",seeks_tags:["餐飲連鎖","行銷曝光"],offers_tags:["品牌設計","行銷曝光"],light:{"主導":0.20,"獨立":0.75,"穩場":0.20,"角框":0.15,"依附":0.15,"游擇":0.25,"挑釁":0.20},shadow:{"主導":0.10,"獨立":0.40,"穩場":0.10,"角框":0.10,"依附":0.15,"游擇":0.20,"挑釁":0.15,"操控":0.05},gravity:0.40,attraction:0.50,inertia:0.25,energy:0.60,awareness:0.55},
-{id:"M07",name:"劉冠廷",title:"連鎖火鍋店老闆",seeking:"想找品牌設計師重新做菜單跟店面視覺",offering:"有三間分店的展店經驗，可以帶新手加盟主避雷",seeks_tags:["品牌設計","人才招募"],offers_tags:["餐飲連鎖","教育培訓"],light:{"主導":0.55,"獨立":0.25,"穩場":0.50,"角框":0.20,"依附":0.15,"游擇":0.20,"挑釁":0.25},shadow:{"主導":0.30,"獨立":0.10,"穩場":0.20,"角框":0.15,"依附":0.15,"游擇":0.15,"挑釁":0.20,"操控":0.10},gravity:0.55,attraction:0.45,inertia:0.45,energy:0.65,awareness:0.50},
-{id:"M08",name:"許雅芳",title:"AI 導入顧問（新創）",seeking:"想找傳產工廠當第一個示範案例客戶",offering:"能幫工廠導入 AI 品檢跟自動化排程系統",seeks_tags:["製造代工","數位轉型"],offers_tags:["AI導入","數位轉型"],light:{"主導":0.40,"獨立":0.70,"穩場":0.20,"角框":0.15,"依附":0.10,"游擇":0.30,"挑釁":0.25},shadow:{"主導":0.20,"獨立":0.35,"穩場":0.10,"角框":0.10,"依附":0.10,"游擇":0.25,"挑釁":0.15,"操控":0.10},gravity:0.45,attraction:0.60,inertia:0.20,energy:0.92,awareness:0.55},
-{id:"M09",name:"吳宗翰",title:"保險經紀人",seeking:"隨時都在找新客戶跟轉介紹名單，逢人就推銷保單",offering:"號稱能幫大家做完整的風險規劃跟資產配置",seeks_tags:["行銷曝光","人才招募"],offers_tags:["財稅規劃","法務合規"],light:{"主導":0.30,"獨立":0.20,"穩場":0.20,"角框":0.25,"依附":0.30,"游擇":0.30,"挑釁":0.35},shadow:{"主導":0.45,"獨立":0.20,"穩場":0.10,"角框":0.20,"依附":0.25,"游擇":0.35,"挑釁":0.35,"操控":0.75},gravity:0.35,attraction:0.30,inertia:0.25,energy:0.70,awareness:0.25},
-{id:"M10",name:"鄭淑芬",title:"扶輪社社長夫人、房仲業者",seeking:"想認識法務朋友幫忙處理客戶的產權糾紛",offering:"手上有不少店面跟廠房物件可以介紹給需要的會員",seeks_tags:["法務合規","財稅規劃"],offers_tags:["不動產","資金融資"],light:{"主導":0.35,"獨立":0.25,"穩場":0.60,"角框":0.35,"依附":0.35,"游擇":0.20,"挑釁":0.10},shadow:{"主導":0.15,"獨立":0.10,"穩場":0.20,"角框":0.25,"依附":0.30,"游擇":0.15,"挑釁":0.05,"操控":0.10},gravity:0.60,attraction:0.50,inertia:0.50,energy:0.50,awareness:0.60},
-{id:"M11",name:"陳彥廷",title:"剛加入的年輕會員、貿易新創",seeking:"什麼都想要，資金、人脈、案源來者不拒，還沒想清楚方向",offering:"會講一口流利英日文，可以幫忙翻譯或接待外賓",seeks_tags:["資金融資","出口貿易","人才招募"],offers_tags:["出口貿易","教育培訓"],light:{"主導":0.15,"獨立":0.20,"穩場":0.15,"角框":0.20,"依附":0.65,"游擇":0.35,"挑釁":0.15},shadow:{"主導":0.10,"獨立":0.10,"穩場":0.10,"角框":0.15,"依附":0.55,"游擇":0.30,"挑釁":0.10,"操控":0.10},gravity:0.20,attraction:0.35,inertia:0.15,energy:0.55,awareness:0.30},
-{id:"M12",name:"蔡文彬",title:"只想拿好處的資深會員、機械貿易商",seeking:"什麼資源都想要，供應鏈、資金、標案通通打聽",offering:"嘴上說會介紹人脈，但從沒真的介紹過誰",seeks_tags:["供應鏈","公部門標案","資金融資"],offers_tags:["供應鏈","出口貿易"],light:{"主導":0.30,"獨立":0.25,"穩場":0.30,"角框":0.20,"依附":0.55,"游擇":0.30,"挑釁":0.15},shadow:{"主導":0.20,"獨立":0.10,"穩場":0.10,"角框":0.15,"依附":0.60,"游擇":0.35,"挑釁":0.15,"操控":0.35},gravity:0.25,attraction:0.25,inertia:0.35,energy:0.30,awareness:0.30},
-{id:"M13",name:"楊惠雯",title:"教育培訓公司負責人",seeking:"想找中小企業主當企業內訓的客戶",offering:"能設計客製化的員工培訓課程跟主管教練",seeks_tags:["人才招募","行銷曝光"],offers_tags:["教育培訓","人才招募"],light:{"主導":0.30,"獨立":0.55,"穩場":0.40,"角框":0.20,"依附":0.15,"游擇":0.20,"挑釁":0.15},shadow:{"主導":0.15,"獨立":0.30,"穩場":0.15,"角框":0.15,"依附":0.10,"游擇":0.15,"挑釁":0.10,"操控":0.05},gravity:0.50,attraction:0.55,inertia:0.35,energy:0.60,awareness:0.65},
-{id:"M14",name:"周柏翰",title:"永遠在換方向的斜槓創業者",seeking:"這個月想做電商、下個月想做餐飲，逢人就換說法",offering:"什麼都懂一點、什麼都可以聊，但沒有一項做深",seeks_tags:["電商通路","餐飲連鎖","AI導入"],offers_tags:["行銷曝光","教育培訓"],light:{"主導":0.25,"獨立":0.30,"穩場":0.10,"角框":0.15,"依附":0.20,"游擇":0.75,"挑釁":0.20},shadow:{"主導":0.15,"獨立":0.15,"穩場":0.05,"角框":0.10,"依附":0.20,"游擇":0.65,"挑釁":0.20,"操控":0.15},gravity:0.20,attraction:0.40,inertia:0.15,energy:0.65,awareness:0.35},
-{id:"M15",name:"簡志偉",title:"標案顧問、退休公務員",seeking:"想找需要做公部門標案的中小企業客戶",offering:"熟悉政府採購流程，能幫忙寫標案企劃書",seeks_tags:["公部門標案","行銷曝光"],offers_tags:["公部門標案","法務合規"],light:{"主導":0.35,"獨立":0.30,"穩場":0.65,"角框":0.40,"依附":0.20,"游擇":0.15,"挑釁":0.10},shadow:{"主導":0.15,"獨立":0.15,"穩場":0.20,"角框":0.30,"依附":0.15,"游擇":0.10,"挑釁":0.05,"操控":0.05},gravity:0.55,attraction:0.40,inertia:0.60,energy:0.40,awareness:0.55},
-{id:"M16",name:"何佳蓉",title:"醫美診所院長",seeking:"想找行銷曝光資源，也想找品牌設計重塑診所形象",offering:"能提供會員健康檢查優惠、醫療顧問諮詢",seeks_tags:["行銷曝光","品牌設計"],offers_tags:["健康醫療","教育培訓"],light:{"主導":0.45,"獨立":0.50,"穩場":0.35,"角框":0.20,"依附":0.15,"游擇":0.25,"挑釁":0.20},shadow:{"主導":0.25,"獨立":0.20,"穩場":0.15,"角框":0.15,"依附":0.10,"游擇":0.20,"挑釁":0.15,"操控":0.10},gravity:0.50,attraction:0.65,inertia:0.30,energy:0.60,awareness:0.55},
-{id:"M17",name:"賴俊良",title:"傳產紡織廠三代目",seeking:"想找出口貿易夥伴，把家族布料賣去東南亞",offering:"工廠有現成產能，也熟悉供應鏈跟原物料議價",seeks_tags:["出口貿易","電商通路"],offers_tags:["製造代工","供應鏈"],light:{"主導":0.30,"獨立":0.35,"穩場":0.55,"角框":0.45,"依附":0.25,"游擇":0.15,"挑釁":0.10},shadow:{"主導":0.15,"獨立":0.15,"穩場":0.15,"角框":0.30,"依附":0.20,"游擇":0.10,"挑釁":0.05,"操控":0.05},gravity:0.55,attraction:0.45,inertia:0.55,energy:0.45,awareness:0.55},
-{id:"M18",name:"孫嘉玲",title:"獨立記帳士",seeking:"想找小型電商跟餐飲業主當長期記帳客戶",offering:"提供中小企業記帳跟財稅申報服務",seeks_tags:["電商通路","餐飲連鎖"],offers_tags:["財稅規劃","法務合規"],light:{"主導":0.20,"獨立":0.45,"穩場":0.50,"角框":0.25,"依附":0.20,"游擇":0.15,"挑釁":0.10},shadow:{"主導":0.10,"獨立":0.25,"穩場":0.20,"角框":0.15,"依附":0.15,"游擇":0.10,"挑釁":0.05,"操控":0.05},gravity:0.40,attraction:0.35,inertia:0.40,energy:0.22,awareness:0.50},
-{id:"M19",name:"洪信雄",title:"強勢派扶輪社前社長、營造業老闆",seeking:"想找公部門標案跟不動產開發的合作機會",offering:"在地人脈深厚，可以喬事情、介紹官員跟民代",seeks_tags:["公部門標案","不動產"],offers_tags:["公部門標案","不動產"],light:{"主導":0.80,"獨立":0.40,"穩場":0.55,"角框":0.35,"依附":0.10,"游擇":0.10,"挑釁":0.35},shadow:{"主導":0.65,"獨立":0.20,"穩場":0.20,"角框":0.25,"依附":0.10,"游擇":0.10,"挑釁":0.30,"操控":0.30},gravity:0.75,attraction:0.55,inertia:0.60,energy:0.70,awareness:0.45},
-{id:"M20",name:"曾雅琪",title:"愛唱反調的青創協會理事、文創商品開發者",seeking:"想找電商通路跟行銷曝光機會，但常公開質疑商會的做法",offering:"能設計文創聯名商品，也常在會議上點出大家沒發現的問題",seeks_tags:["電商通路","行銷曝光"],offers_tags:["品牌設計","行銷曝光"],light:{"主導":0.35,"獨立":0.60,"穩場":0.15,"角框":0.10,"依附":0.10,"游擇":0.30,"挑釁":0.75},shadow:{"主導":0.25,"獨立":0.30,"穩場":0.10,"角框":0.10,"依附":0.10,"游擇":0.25,"挑釁":0.65,"操控":0.15},gravity:0.35,attraction:0.40,inertia:0.20,energy:0.60,awareness:0.60}
-];
-
-const FORCES=["主導","獨立","穩場","角框","依附","游擇","挑釁"];
-const C={
-"主導":{"主導":-1,"獨立":2,"穩場":1,"角框":-2,"依附":-1,"游擇":0,"挑釁":1},
-"獨立":{"主導":2,"獨立":1,"穩場":2,"角框":0,"依附":-1,"游擇":0,"挑釁":1},
-"穩場":{"主導":1,"獨立":2,"穩場":0,"角框":0,"依附":-2,"游擇":-1,"挑釁":0},
-"角框":{"主導":-2,"獨立":0,"穩場":0,"角框":-1,"依附":-1,"游擇":0,"挑釁":-1},
-"依附":{"主導":-1,"獨立":-1,"穩場":-2,"角框":-1,"依附":-1,"游擇":0,"挑釁":-1},
-"游擇":{"主導":0,"獨立":0,"穩場":-1,"角框":0,"依附":0,"游擇":0,"挑釁":0},
-"挑釁":{"主導":1,"獨立":1,"穩場":0,"角框":-1,"依附":-1,"游擇":0,"挑釁":-2}};
-const COLORS={"主導":"#e85a4f","獨立":"#5689b8","穩場":"#4d9c7d","角框":"#a08144","依附":"#8674b2","游擇":"#e8884b","挑釁":"#b85675"};
-const TIPS={
-"主導":"設定方向、匯聚眾人力量的中心（星系比喻：中心恆星）。健康時給方向、扛決策；過度時變成一言堂，聽不到異議。",
-"獨立":"自己承擔自身重量與責任，各循軌道自行運轉；健康場的骨幹，敢對主導者說真話。過度時單打獨鬥、難以協作。",
-"穩場":"感知張力、微調平衡的人，在乎責任是否對齊、承重是否平衡；必要時介入、穩定後退場。過度時變成代償節點，燃燒自己撐全場。",
-"角框":"靠角色、頭銜、規矩與敘事立足，幫場建立秩序感。過度時開始過濾異議，只留下擁護的聲音。",
-"依附":"把重量掛在別人身上，以情緒認同換取位置。健康時是溫暖的支持者；過多時形成代償壓力，最先壓垮穩場者。",
-"游擇":"在場之間游移、選擇，帶進新資訊與活力。不落地時只放大願景、不承擔重量。",
-"挑釁":"會出手戳場的人。健康時是異議與校準的重要來源；過度時為反對而反對，製造衝突。"};
-
-
-function mainForce(m){let bk=null,bv=-1;for(const f of FORCES){if(m.light[f]>bv){bv=m.light[f];bk=f;}}return bk;}
-function comp(a,b){let num=0,den=0;for(const i of FORCES)for(const j of FORCES){const w=a.light[i]*b.light[j];num+=w*C[i][j];den+=w;}return ((den?num/den:0)+2)/4;}
-function sd(a,b){const ab=a.offers_tags.filter(t=>b.seeks_tags.includes(t)).length/Math.max(1,b.seeks_tags.length);
-const ba=b.offers_tags.filter(t=>a.seeks_tags.includes(t)).length/Math.max(1,a.seeks_tags.length);return {avg:(ab+ba)/2,gap:Math.abs(ab-ba)};}
-function em(a,b){return 1-Math.abs(a.energy-b.energy);}
-function vuln(m){return (m.shadow["依附"]+m.shadow["角框"])/2;}
-function risk(a,b){const man=Math.max(a.shadow["操控"]*vuln(b),b.shadow["操控"]*vuln(a));
-const grav=Math.max(0,.5-a.gravity)+Math.max(0,.5-b.gravity);return Math.min(1,Math.max(man,grav));}
-function tension(a,b){return ((a.light["獨立"]+a.light["挑釁"])*b.light["主導"]+(b.light["獨立"]+b.light["挑釁"])*a.light["主導"])/2;}
-function pairScore(a,b){
-  const c=comp(a,b),s=sd(a,b),e=em(a,b),r=risk(a,b),t=tension(a,b);
-  const score=.25*c+.30*s.avg+.20*e+.25*(1-r);
-  let cat;
-  if(r>=.5||score<.42)cat="不建議";
-  else if(t>=.38&&r<.45&&score<.68)cat="刺激型";
-  else if(score>=.60&&r<.35)cat="優先聊";
-  else if(score>=.50)cat="值得短聊";
-  else cat="不建議";
-  return {a,b,score,c,sd:s.avg,gap:s.gap,em:e,risk:r,t,cat};
-}
-const PAIRS=[];
-for(let i=0;i<MEMBERS.length;i++)for(let j=i+1;j<MEMBERS.length;j++)PAIRS.push(pairScore(MEMBERS[i],MEMBERS[j]));
-PAIRS.sort((x,y)=>y.score-x.score);
-const CATS={};PAIRS.forEach(p=>CATS[p.cat]=(CATS[p.cat]||0)+1);
-
-// stat chips
-const chipCls={"優先聊":"good","值得短聊":"mid","刺激型":"spark2","不建議":"bad"};
-document.getElementById("chips").innerHTML=["優先聊","刺激型","值得短聊","不建議"]
- .map(c=>`<span class="chip ${chipCls[c]}">${c} ${CATS[c]||0} 組</span>`).join("")
- +`<span class="chip">共 ${PAIRS.length} 組配對</span>`;
-
-// legend
-document.getElementById("legend").innerHTML=FORCES.map(f=>`<span class="term" data-tip="${TIPS[f]}"><i style="background:${COLORS[f]}"></i>${f}</span>`).join("");
-
-// network canvas
-const cv=document.getElementById("net"),ctx=cv.getContext("2d");
-const NODES=MEMBERS.map((m,i)=>{
-  const ang=-Math.PI/2+i*2*Math.PI/MEMBERS.length;
-  return {m,x:320+225*Math.cos(ang),y:280+225*Math.sin(ang),r:13+m.attraction*10,color:COLORS[mainForce(m)]};
-});
-const TOP=PAIRS.slice(0,12);
-let selected=null,tick=0;
-function draw(){
-  tick++;
-  ctx.clearRect(0,0,640,560);
-  // links
-  TOP.forEach((p,k)=>{
-    const na=NODES.find(n=>n.m.id===p.a.id),nb=NODES.find(n=>n.m.id===p.b.id);
-    const on=(tick/40+k*.5)%12<8;
-    ctx.strokeStyle=p.cat==="優先聊"?"rgba(77,156,125,"+(on?.55:.18)+")":p.cat==="刺激型"?"rgba(232,136,75,"+(on?.55:.18)+")":"rgba(86,137,184,"+(on?.4:.15)+")";
-    ctx.lineWidth=1+p.score*2.4;
-    ctx.beginPath();ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);ctx.stroke();
-  });
-  // selected links
-  if(selected){
-    PAIRS.filter(p=>p.a.id===selected.m.id||p.b.id===selected.m.id).slice(0,6).forEach(p=>{
-      const other=p.a.id===selected.m.id?p.b:p.a;
-      const no=NODES.find(n=>n.m.id===other.id);
-      ctx.strokeStyle="rgba(232,90,79,.8)";ctx.lineWidth=2.5;
-      ctx.setLineDash([6,5]);ctx.lineDashOffset=-tick*.4;
-      ctx.beginPath();ctx.moveTo(selected.x,selected.y);ctx.lineTo(no.x,no.y);ctx.stroke();
-      ctx.setLineDash([]);
-    });
-  }
-  // nodes
-  NODES.forEach(n=>{
-    const sel=selected&&selected.m.id===n.m.id;
-    ctx.beginPath();ctx.arc(n.x,n.y,n.r+(sel?4+Math.sin(tick*.1)*2:0),0,7);
-    ctx.fillStyle=n.color;ctx.globalAlpha=sel?1:.88;ctx.fill();ctx.globalAlpha=1;
-    if(sel){ctx.strokeStyle="#1a1612";ctx.lineWidth=2.5;ctx.stroke();}
-    ctx.fillStyle="#fff";ctx.font="700 11px 'Noto Sans TC'";ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText(n.m.name.slice(0,1),n.x,n.y);
-    ctx.fillStyle="#3a342d";ctx.font="12px 'Noto Sans TC'";
-    const lx=n.x+(n.x-320)*.16,ly=n.y+(n.y-280)*.16;
-    ctx.fillText(n.m.name,lx,ly);
-  });
-  requestAnimationFrame(draw);
-}
-draw();
-cv.addEventListener("click",ev=>{
-  const rect=cv.getBoundingClientRect();
-  const x=(ev.clientX-rect.left)*640/rect.width,y=(ev.clientY-rect.top)*560/rect.height;
-  const hit=NODES.find(n=>Math.hypot(n.x-x,n.y-y)<n.r+12);
-  if(hit){selected=hit;showDetail(hit.m);}
-});
-function barHtml(label,val,color){
-  return `<div class="bar"><span style="width:74px">${label}</span><span class="track"><i style="width:${Math.round(val*100)}%;background:${color}"></i></span><span style="width:44px;text-align:right">${val.toFixed(2)}</span></div>`;
-}
-function showDetail(m){
-  const my=PAIRS.filter(p=>p.a.id===m.id||p.b.id===m.id).sort((x,y)=>y.score-x.score);
-  const good=my.slice(0,3);
-  const worst=my.filter(p=>p.cat==="不建議").slice(0,1);
-  let html=`<h3>${m.name}</h3><p class="role">${m.title} · 主力態偏「${mainForce(m)}」</p>
-  <p style="font-size:1rem;color:var(--ink-soft)">找：${m.seeking}<br>給：${m.offering}</p>`;
-  html+=good.map(p=>{
-    const other=p.a.id===m.id?p.b:p.a;
-    return `<div class="matchrow"><div class="mr-head"><span>→ ${other.name}（${other.title}）</span><span class="cat ${p.cat}">${p.cat} ${p.score.toFixed(2)}</span></div>
-    ${barHtml("力態互補",p.c,"var(--c-sky)")}${barHtml("供需對接",p.sd,"var(--c-mint)")}${barHtml("節奏匹配",p.em,"var(--c-peach)")}${barHtml("風險",p.risk,"var(--c-coral)")}</div>`;
-  }).join("");
-  if(worst.length){
-    const p=worst[0];const other=p.a.id===m.id?p.b:p.a;
-    html+=`<div class="matchrow"><div class="mr-head"><span>⚠ ${other.name}（${other.title}）</span><span class="cat 不建議">不建議 風險 ${p.risk.toFixed(2)}</span></div><p class="hint">系統擋雷：這組風險項超標，媒合報告會直接跳過，保護雙方。</p></div>`;
-  }
-  html+=`<p class="hint">每個分數都可追溯到公式與資料，可稽核、可被質疑、可被回饋修正。</p>`;
-  document.getElementById("detail").innerHTML=html;
-}
-// 預設選一位示範
-selected=NODES.find(n=>n.m.id==="M06");showDetail(MEMBERS[5]);
-
-// field health
-const n=MEMBERS.length;
-const indep=MEMBERS.filter(m=>m.gravity>=.6).length/n;
-const loads=MEMBERS.map(m=>m.attraction*m.gravity).sort((a,b)=>b-a);
-const conc=loads.slice(0,3).reduce((a,b)=>a+b,0)/loads.reduce((a,b)=>a+b,0);
-const dissent=MEMBERS.reduce((s,m)=>s+m.light["獨立"]+m.light["挑釁"],0)/MEMBERS.reduce((s,m)=>s+m.light["角框"]+m.light["依附"],0);
-const manip=Math.max(...MEMBERS.map(m=>m.shadow["操控"]))*(MEMBERS.reduce((s,m)=>s+vuln(m),0)/n);
-const stab=Math.max(0,Math.min(1,.4*indep+.3*(1-conc)+.3*Math.min(1,dissent)));
-const H=[
- {n:"獨立承重占比",v:indep,l:indep<.4?"red":indep<.5?"yellow":"green",d:"能扛住自己重量的成員比例"},
- {n:"承重集中度",v:conc,l:conc>.6?"red":conc>.45?"yellow":"green",d:"重量是否壓在少數人身上"},
- {n:"異議保有度",v:dissent,l:dissent<.3?"red":dissent<.6?"yellow":"green",d:"場內還聽得到不同意見嗎"},
- {n:"操控滲透指數",v:manip,l:manip>.25?"red":manip>.15?"yellow":"green",d:"推銷滲透型行為的風險"},
- {n:"系統穩定度",v:stab,l:stab>.8?"green":stab>.5?"yellow":"red",d:"整體結構健康綜合分"}];
-document.getElementById("health").innerHTML=H.map(h=>`<div class="hcard"><div class="dot ${h.l}"></div><div class="hv">${h.v.toFixed(2)}</div><div class="hn"><b>${h.n}</b><br>${h.d}</div></div>`).join("");
-document.getElementById("healthnote").textContent="場體檢示範：這個模擬商會的「獨立承重占比」亮紅燈、滲透與穩定度亮黃燈。系統誠實告訴主辦方：這個場目前需要補進更多能自我承重的成員，並留意推銷滲透。這就是給商會經營者的儀表板。";
-
-
 // hover 詞卡 tooltip
 const tt=document.createElement("div");tt.id="ttip";document.body.appendChild(tt);
 document.addEventListener("mousemove",e=>{
